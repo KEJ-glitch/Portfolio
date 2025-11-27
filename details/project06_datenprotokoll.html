@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DATENPROTOKOLL</title>
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+    <style>
+        /* [이 페이지 전용 스타일] */
+        
+        /* 1. 풀와이드 슬라이드쇼 (기존) */
+        .full-width-slider {
+            position: relative;
+            width: 100%;
+            height: 45vh; 
+            margin-top: 60px;
+            margin-bottom: 0; /* 영상과 이어지도록 하단 여백 제거 */
+            background-color: #F0F0F0;
+            overflow: hidden;
+        }
+
+        .full-slide {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            object-fit: cover; opacity: 0; transition: opacity 1.5s ease-in-out; z-index: 1;
+        }
+        .full-slide.active { opacity: 1; z-index: 2; }
+
+        /* 2. 풀와이드 미디어 (Vimeo용 추가) */
+        .full-width-media {
+            width: 100%;
+            position: relative;
+            background-color: #000;
+            margin-bottom: 60px; /* 텍스트와의 간격 */
+        }
+
+        /* 영상 높이 설정 (시네마틱 비율) */
+        .full-width-media.video-mode {
+            height: 60vh; /* 화면 높이의 60% */
+        }
+
+        .full-width-media iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+        }
+
+        /* 3. 텍스트 컨테이너 간격 */
+        .content-container-wrap {
+            margin-top: 60px;
+        }
+
+        @media (max-width: 768px) {
+            .full-width-slider { height: 50vh; }
+            .full-width-media.video-mode { height: 40vh; } /* 모바일에서 영상 높이 줄임 */
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="container header-flex">
+            <a href="../index.html" class="logo">KIM EUNJUN.</a>
+            <nav>
+                <a href="../index.html#works">Back to List</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="project-detail">
+        
+        <div class="container">
+            <div class="detail-header">
+                <span class="category">Audiovisual Performance / Media Art</span>
+                <h1>DATENPROTOKOLL</h1>
+                <div class="meta-info">
+                    <span>Year: 2022</span>
+                    <span>Role: Sound & System Development</span>
+                    <span>Project: Studio Jinseung Jang Presents</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="full-width-slider">
+            <img src="../images/work06.png" alt="DATENPROTOKOLL View 1" class="full-slide active">
+        </div>
+
+        <div class="full-width-media video-mode">
+            <iframe 
+                src="https://player.vimeo.com/video/777978668?h=00000000&title=0&byline=0&portrait=0" 
+                allow="autoplay; fullscreen; picture-in-picture" 
+                allowfullscreen>
+            </iframe>
+        </div>
+
+        <div class="container content-container-wrap">
+            
+            <div class="detail-content">
+                <div class="description">
+                    <h3>DATENPROTOKOLL</h3>
+                    <p>
+                        Jang Jin-seung talks about the relationship between technology and humans in a modern society where reality and virtuality are intricately intertwined. The artist proposes the possibility of coexistence by seeking the point of contact between reality and virtuality through a technological approach, and is interested in human perception acquiring new senses in virtual space and time. This work, which utilizes the 'Data Conversion Protocol (DATENPROTOKOLL)' system he developed, becomes an artistic method that philosophically examines human perception in the digital age.
+                    </p>
+                    <p>
+                        The artist proposes that we think together about the reality of human perception at the present time by presenting the subject performing the performance from the audience to the screen.
+                    </p>
+                    <blockquote style="border-left: 3px solid #ccc; padding-left: 15px; margin: 20px 0; color: #555; font-style: italic;">
+                        "Technology assumes that it has gone through a period of rapid development and is in a kind of stagnation period, and transfers fragmented problems from the future to the present. The relationship through the simple interaction of the human physical body and the mechanical device sensor provides a certain degree of convenience, but it cannot lead to the development of ideal technology beyond that!" <br>
+                        <span style="font-size: 0.9rem; font-style: normal;">— From the artist's note</span>
+                    </blockquote>
+                    <p style="margin-top: 30px; font-size: 0.9rem; color: #666;">
+                        "DATENPROTOKOLL", 2022, 2 channel video, color, sound (stereo), 15'00"
+                    </p>
+                </div>
+                
+                <div class="credits">
+                    <h3>Credits</h3>
+                    <ul>
+                        <li><strong>Studio:</strong> Studio Jinseung Jang Presents</li>
+                        <li><strong>Choreography:</strong> CHAK, SEUNGJIN BAEK</li>
+                        <li><strong>Film & Edit:</strong> daft FILM</li>
+                        <li><strong>Sound & System Development:</strong> WONWOORI, EUNJUN KIM</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="container"> 
+                <div class="project-navigation">
+                    <a href="project07_islandAir.html" class="nav-item nav-left">← Next Work</a>
+                    <a href="../index.html#works" class="nav-item nav-list">List</a>
+                    <a href="project05_interrupt.html" class="nav-item nav-right">Previous Work →</a>
+            </div>
+
+        </div> 
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 KIM EUNJUN. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const slides = document.querySelectorAll('.full-slide');
+            let currentSlide = 0;
+            const slideInterval = 3000; 
+
+            if(slides.length > 1) {
+                setInterval(() => {
+                    slides[currentSlide].classList.remove('active');
+                    currentSlide = (currentSlide + 1) % slides.length;
+                    slides[currentSlide].classList.add('active');
+                }, slideInterval);
+            }
+        });
+    </script>
+
+</body>
+</html>

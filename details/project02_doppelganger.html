@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doppelgänger - KIM EUNJUN</title>
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+    <style>
+        /* [이 페이지 전용 스타일] */
+        
+        /* 1. 풀와이드 슬라이드쇼 (줌 아웃 모션) */
+        .full-width-slider {
+            position: relative;
+            width: 100%;
+            height: 45vh;
+            margin-top: 60px;
+            margin-bottom: 0; 
+            background-color: #F0F0F0;
+            overflow: hidden;
+        }
+
+        .full-slide {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            object-fit: cover;
+            opacity: 0; 
+            transition: opacity 2s ease-in-out;
+            z-index: 1;
+            transform-origin: center center;
+        }
+
+        /* 줌 아웃 모션 (15초 동안 천천히) */
+        .full-slide.active {
+            opacity: 1;
+            z-index: 2;
+            animation: zoomOut 6s linear infinite;
+        }
+
+        @keyframes zoomOut {
+            0% { transform: scale(1.05); }
+            100% { transform: scale(1.0); }
+        }
+
+        /* 텍스트 컨테이너 */
+        .content-container-wrap { margin-top: 60px; }
+
+        /* 네비게이션 */
+        .previous-project {
+            margin-top: 60px; border-top: 1px solid #E5E5E5; padding-top: 40px; text-align: right;
+        }
+        .previous-project a { font-size: 2rem; font-weight: 700; }
+
+        /* 모바일 대응 */
+        @media (max-width: 768px) {
+            .full-width-slider { height: 50vh; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="container header-flex">
+            <a href="../index.html" class="logo">KIM EUNJUN.</a>
+            <nav>
+                <a href="../index.html#works">Back to List</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="project-detail">
+        
+        <div class="container">
+            <div class="detail-header">
+                <span class="category">VR Performance</span>
+                <h1>Doppelgänger</h1>
+                <div class="meta-info">
+                    <span>Year: 2021</span>
+                    <span>Role: Sound Director</span>
+                    <span>Venue: Platform-L Live Hall</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="full-width-slider">
+            <img src="../images/work02.jpg" alt="Doppelgänger View 1" class="full-slide active">
+            <img src="../images/work02_1.jpg" alt="Doppelgänger View 2" class="full-slide">
+            <img src="../images/work02_2.png" alt="Doppelgänger View 3" class="full-slide">
+            <img src="../images/work02_3.jpg" alt="Doppelgänger View 4" class="full-slide">
+            <img src="../images/work02_4.png" alt="Doppelgänger View 5" class="full-slide">
+        </div>
+
+        <div class="container content-container-wrap">
+            <div class="detail-content">
+                <div class="description">
+                    <h3>Reality and Virtuality: The Coexistence</h3>
+                    <p>
+                        "Doppelgänger" is a VR performance selected for the 2021 ARKO Art & Tech project. It explores the intricate relationship between the physical self and the virtual alter ego in the digital age.
+                    </p>
+                    <p>
+                        The performance creates a space where reality and virtuality intersect, questioning the definition of existence. Through the medium of VR, the audience experiences a unique synchronization with the performer, blurring the lines between the observer and the observed.
+                    </p>
+                    <p>
+                        The sound design focuses on enhancing this immersive experience, using spatial audio techniques to bridge the gap between the virtual environment and the physical venue. The music evolves in real-time, reacting to the performer's movements and the changing landscapes within the VR space.
+                    </p>
+                </div>
+                
+                <div class="credits">
+                    <h3>Credits</h3>
+                    <ul>
+                        <li><strong>General Director:</strong> Cho Chungyeon</li>
+                        <li><strong>Technical Director:</strong> Ban Sunghoon</li>
+                        <li><strong>Director:</strong> Ju Daeun</li>
+                        <li><strong>Assistant Director:</strong> Song Jueun</li>
+                        <li><strong>PM:</strong> Cho Dohyun</li>
+                        <li><strong>Choreography & Cast:</strong> Kim Yongbin, Yu Jiyoung, Lee Yeji, Lee Jonghyun</li>
+                        <li><strong>Sound:</strong> Kim EunJun, Shim Chaeyoon</li>
+                        <li><strong>Space Design:</strong> Kim Jiyeon</li>
+                        <li><strong>Lighting:</strong> Kim Hyomin</li>
+                        <li><strong>VR Graphics:</strong> Birdhand</li>
+                        <li><strong>Technology:</strong> Reconf Labs</li>
+                        <li><strong>Leaflet Design:</strong> Son Hyobin</li>
+                        <li style="margin-top: 15px; border-top: 1px solid #eee; padding-top: 10px;">
+                            <strong>Host:</strong> ARKO Art & Tech
+                        </li>
+                        <li><strong>Organizer:</strong> Hanyang Univ. IACF</li>
+                        <li><strong>Production:</strong> K-Arts IACF (AT Lab)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="container"> 
+                <div class="project-navigation">
+                    <a href="project03_line.html" class="nav-item nav-left">← Next Work</a>
+                    <a href="../index.html#works" class="nav-item nav-list">List</a>
+                    <a href="project01_regulation.html" class="nav-item nav-right">Previous Work →</a>
+            </div>
+        </div>
+
+        </div> 
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 KIM EUNJUN. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const slides = document.querySelectorAll('.full-slide');
+            let currentSlide = 0;
+            // 6초 간격 설정
+            const slideInterval = 6000; 
+
+            if(slides.length > 1) {
+                setInterval(() => {
+                    // 현재 이미지 숨김
+                    slides[currentSlide].classList.remove('active');
+                    
+                    // 다음 순서 계산
+                    currentSlide = (currentSlide + 1) % slides.length;
+                    
+                    // 다음 이미지 표시
+                    slides[currentSlide].classList.add('active');
+                }, slideInterval);
+            }
+        });
+    </script>
+
+</body>
+</html>

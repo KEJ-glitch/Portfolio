@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lucid - KIM EUNJUN</title>
+    <link rel="stylesheet" href="../style.css"> 
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+    <style>
+        /* [풀-와이드 미디어 스타일] */
+        .full-width-media {
+            width: 100%;
+            position: relative;
+            background-color: #000;
+            margin-bottom: 60px;
+        }
+
+        /* 영상 높이 설정 (시네마틱 비율) */
+        .full-width-media.video-mode {
+            height: 60vh; /* 화면 높이의 60% */
+            margin-top: 60px; /* 헤더와의 간격 */
+        }
+
+        /* PDF 높이 설정 */
+        .full-width-media.pdf-mode {
+            height: 800px;
+            background-color: #FFF;
+            border-top: 1px solid #E5E5E5;
+            border-bottom: 1px solid #E5E5E5;
+            margin-top: 30px;
+        }
+
+        .full-width-media iframe,
+        .full-width-media embed {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+        }
+
+        /* 텍스트 컨테이너 간격 */
+        .content-container-wrap {
+            margin-top: 60px;
+        }
+
+        /* PDF 제목 섹션 */
+        .score-title-section {
+            margin-top: 100px;
+            padding-top: 60px;
+            border-top: 1px solid #E5E5E5;
+        }
+        .score-title-section h3 {
+            font-size: 1.1rem; margin: 0;
+            text-transform: uppercase; letter-spacing: 0.05em; color: #999;
+        }
+
+        @media (max-width: 768px) {
+            .full-width-media.video-mode { height: 40vh; }
+            .full-width-media.pdf-mode { height: 500px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="container header-flex">
+            <a href="../index.html" class="logo">KIM EUNJUN.</a>
+            <nav>
+                <a href="../index.html#works">Back to List</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="project-detail">
+        
+        <div class="container">
+            <div class="detail-header">
+                <span class="category">Piano and Live Electronics</span>
+                <h1>Lucid</h1>
+                <div class="meta-info">
+                    <span>Year: 2025</span>
+                    <span>Role: Composer</span>
+                    <span>Venue: SICMF 2025, CKL Stage</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="full-width-media video-mode">
+            <iframe 
+                src="https://www.youtube.com/embed/B_PQpFv-XMg?rel=0&modestbranding=1" 
+                title="Lucid Performance Video" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                allowfullscreen>
+            </iframe>
+        </div>
+
+        <div class="container content-container-wrap">
+            <div class="detail-content">
+                <div class="description">
+                    <h3>Perceptual Duality, Blurring Reality and Illusion</h3>
+                    <p>
+                        "Lucid" explores the boundary between clarity and illusion. The title evokes both a moment of heightened awareness and a dreamlike ambiguity, capturing a dual sense of perception. Through the interplay of piano resonance and electronic sound, the piece traces the shifting perception of space and resonance.
+                    </p>
+                    <p>
+                        Beginning with the measurable reverberation time of the performance space, the composer examines how spatial characteristics influence the sound—and how those changes are perceived by the listener. The piano's sound is processed in real time through sound synthesis. As the reverb expands, contracts, distorts, or dissolves, it gradually blurs the line between reality and illusion.
+                    </p>
+                </div>
+                
+                <div class="credits">
+                    <h3>Credits</h3>
+                    <ul>
+                        <li><strong>Composition:</strong> Kim Eunjun</li>
+                        <li><strong>Performance:</strong> SICMF 2025</li>
+                        <li><strong>Piano:</strong> Heasung Yun</li>
+                        <li><strong>Venue:</strong> CKL Stage</li>
+                    </ul>
+                </div>
+            </div>
+        </div> <div class="container score-title-section">
+            <h3>Score Preview</h3>
+        </div>
+        
+        <div class="full-width-media pdf-mode">
+            <embed src="../files/Lucid_Score.pdf#toolbar=0&navpanes=0&scrollbar=0" type="application/pdf" />
+            
+            <p class="pdf-fallback" style="text-align: center; padding: 20px;">
+                PDF 뷰어를 지원하지 않는 브라우저입니다. 
+            </p>
+        </div>
+
+        <div class="container"> 
+                <div class="project-navigation">
+                    Comming Soon
+                    <a href="../index.html#works" class="nav-item nav-list">List</a>
+                    <a href="project09_axiom2.html" class="nav-item nav-right">Previous Work →</a>
+            </div>
+
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 KIM EUNJUN. All rights reserved.</p>
+        </div>
+    </footer>
+
+</body>
+</html>

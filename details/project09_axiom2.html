@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Axiom 2 - KIM EUNJUN</title>
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+    <style>
+        /* [이 페이지 전용 스타일] 풀와이드 비디오 */
+        
+        .full-width-media {
+            width: 100%;
+            position: relative;
+            background-color: #000;
+            margin-bottom: 60px; /* 텍스트와의 간격 */
+        }
+
+        /* 영상 높이 설정 (시네마틱 비율: 화면 높이의 60%) */
+        .full-width-media.video-mode {
+            height: 60vh; 
+            margin-top: 60px; /* 헤더와의 간격 */
+        }
+
+        .full-width-media iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+        }
+
+        /* 영상 아래 텍스트 컨테이너 여백 */
+        .content-container-wrap {
+            margin-top: 60px;
+        }
+
+        /* 모바일 대응 */
+        @media (max-width: 768px) {
+            .full-width-media.video-mode { height: 40vh; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="container header-flex">
+            <a href="../index.html" class="logo">KIM EUNJUN.</a>
+            <nav>
+                <a href="../index.html#works">Back to List</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="project-detail">
+        
+        <div class="container">
+            <div class="detail-header">
+                <span class="category">Audio-visual / Media Art</span>
+                <h1>Axiom 2</h1>
+                <div class="meta-info">
+                    <span>Year: 2024</span>
+                    <span>Role: Sound & Visual</span>
+                    <span>Venue: Arts Korea Lab(AKL Festival)</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="full-width-media video-mode">
+            <iframe 
+                src="https://www.youtube.com/embed/-XMb2tGPM-4?rel=0&modestbranding=1" 
+                title="Axiom 2 Performance Video" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                allowfullscreen>
+            </iframe>
+        </div>
+
+        <div class="container content-container-wrap">
+            <div class="detail-content">
+                <div class="description">
+                    <h3>Recursive Growth: Resonance through Organic Systems</h3>
+                    <p>
+                        This updated 2024 version of <em>Recursive Growth</em> further develops the original concept of algorithmic complexity and artificial nature by introducing a more refined, particle-based visual language. While the core of the work still stems from the L-system, a recursive formal grammar derived from natural growth processes, this version pushes the boundaries of organic simulation through advanced generative techniques.
+                    </p>
+                    <p>
+                        Utilizing Jitter’s gen~ environment, the visual elements now evolve with a more fluid, lifelike motion, as if the synthetic structures are breathing, expanding, and dissolving in real time. Each growth iteration doesn’t just replicate form—it divides into microscopic particles, suggesting a world that is both growing and disintegrating at once.
+                    </p>
+                    <p>
+                        The sound mirrors this transformation. Rather than imposing rhythm or linear structure, it flows with the evolving visuals, gradually shifting in spectral density and harmonic texture. Partials and overtones bloom like invisible branches, subtly reacting to the particle movements on screen.
+                    </p>
+                    <p>
+                        But the most important aspect of this version lies in how it engages the audience. There is no narrative or climax—just an ongoing, resonant process. The work invites the viewer-listener to observe, reflect, and feel a quiet resonance, as if the system’s inner logic is echoing within their own perception. It is a sonic-visual meditation on complexity, erosion, and the silent persistence of memory.
+                    </p>
+                </div>
+                
+                <div class="credits">
+                    <h3>Credits</h3>
+                    <ul>
+                        <li><strong>Composition & Visuals:</strong> Kim Eunjun</li>
+                        <li><strong>Performance:</strong> AKL Festival 2024</li>
+                        <li><strong>Venue:</strong> Arts Korea Lab, Seoul</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="container"> 
+                <div class="project-navigation">
+                    <a href="project10_lucid.html" class="nav-item nav-left">← Next Work</a>
+                    <a href="../index.html#works" class="nav-item nav-list">List</a>
+                    <a href="project09_axiom2.html" class="nav-item nav-right">Previous Work →</a>
+            </div>
+
+        </div> </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 KIM EUNJUN. All rights reserved.</p>
+        </div>
+    </footer>
+
+</body>
+</html>

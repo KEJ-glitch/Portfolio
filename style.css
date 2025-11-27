@@ -1,0 +1,502 @@
+/* ==========================================================================
+   1. 기본 설정 (Variables & Reset)
+   ========================================================================== */
+:root {
+    --bg-color: #F7F7F7;       /* 배경: 웜 그레이 */
+    --text-primary: #1A1A1A;   /* 본문: 블랙에 가까운 그레이 */
+    --text-secondary: #666666; /* 보조: 미디엄 그레이 */
+    --line-color: #E5E5E5;     /* 라인: 연한 그레이 */
+    --placeholder-bg: #EAEAEA; /* 박스 배경 */
+}
+
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+    font-weight: 300;
+    line-height: 1.6;
+    letter-spacing: -0.02em;
+}
+
+a { text-decoration: none; color: inherit; transition: opacity 0.3s; }
+a:hover { opacity: 0.6; }
+
+ul { padding: 0; list-style: none; }
+p { margin: 0 0 20px 0; }
+
+.container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 40px;
+}
+
+/* ==========================================================================
+   2. 공통 레이아웃 (Header, Footer, Section)
+   ========================================================================== */
+/* Header */
+header { padding: 50px 0; }
+
+.header-flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    font-weight: 800;
+    font-size: 1.1rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+nav a {
+    margin-left: 30px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+nav a:hover { color: var(--text-primary); }
+
+/* Footer */
+footer { padding: 80px 0; color: #AAA; font-size: 0.8rem; text-align: right; }
+
+/* Section Common */
+.section { padding: 120px 0; border-top: 1px solid var(--line-color); }
+
+.section-title {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin-bottom: 60px;
+    letter-spacing: 0.1em;
+    font-weight: 600;
+}
+
+/* ==========================================================================
+   3. 메인 페이지 (Main Page Specific)
+   ========================================================================== */
+
+/* Hero Section */
+.hero { padding: 100px 0 180px; }
+
+.hero h1 {
+    font-size: 5rem;
+    line-height: 1;
+    margin: 24px 0;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    color: var(--text-primary);
+}
+
+.hero .subtitle {
+    color: var(--text-secondary);
+    font-size: 1rem;
+    margin: 0;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.hero .divider {
+    width: 40px;
+    height: 2px;
+    background: var(--text-primary);
+    margin: 40px 0;
+}
+
+.hero .description {
+    font-size: 1.25rem;
+    color: #444;
+    max-width: 500px;
+    font-weight: 400;
+    word-break: keep-all;
+}
+
+/* Works List (Grid & Thumbnails) */
+.work-list { display: flex; flex-direction: column; gap: 100px; }
+.work-link { display: block; cursor: pointer; } 
+
+.work-item {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 50px;
+    align-items: start;
+}
+
+.work-text h3 { margin: 0 0 10px; font-size: 1.4rem; font-weight: 700; }
+.work-text p { color: var(--text-secondary); font-size: 0.95rem; margin: 0 0 10px; }
+.work-text .year { display: inline-block; font-size: 0.85rem; color: #888; font-family: monospace; }
+
+.iframe-wrap {
+    width: 100%;
+    height: 180px;
+    background: var(--placeholder-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s;
+    overflow: hidden;
+}
+
+.work-thumb {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: all 0.4s ease;
+}
+
+.work-link:hover .work-thumb {
+    transform: scale(1.08);
+}
+
+.placeholder { color: #999; font-size: 0.85rem; font-weight: 500; letter-spacing: 0.05em; }
+
+
+/* About Section (Layout & Text) */
+.about-layout {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 60px;
+}
+
+.bio-container { flex: 1; max-width: 650px; }
+.bio-text { margin-bottom: 60px; }
+.bio-text.korean-ver { margin-top: 60px; }
+
+.lang-title {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    margin-bottom: 15px;
+    letter-spacing: 0.05em;
+    border-left: 2px solid #ccc;
+    padding-left: 10px;
+}
+
+.bio-text p { font-size: 1.05rem; line-height: 1.75; margin-bottom: 20px; color: #333; }
+
+.tag-list { margin-top: 50px; display: flex; flex-wrap: wrap; gap: 15px 30px; }
+.tag-list li { font-size: 0.95rem; color: var(--text-secondary); }
+.tag-list li::before { content: "#"; margin-right: 5px; color: #BBB; }
+
+
+/* About Profile Slider (2 Images Fade) */
+.profile-slider {
+    position: relative;
+    width: 300px;
+    height: 400px;
+    background-color: var(--placeholder-bg);
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.profile-slide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
+}
+.profile-slide.active { opacity: 1; }
+
+
+/* CV / Resume Section */
+.cv-container {
+    margin-top: 100px;
+    border-top: 1px solid var(--line-color);
+    padding-top: 60px;
+}
+.cv-section { margin-bottom: 80px; }
+
+.cv-title {
+    font-size: 0.9rem; font-weight: 700; margin: 0 0 40px 0;
+    text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-primary);
+}
+
+.cv-row { display: flex; margin-bottom: 30px; align-items: baseline; }
+.cv-year {
+    width: 140px; flex-shrink: 0;
+    font-family: monospace, 'Courier New', Courier;
+    color: var(--text-secondary); font-size: 0.9rem; font-weight: 500;
+}
+.cv-content { flex-grow: 1; }
+.cv-item {
+    font-size: 0.95rem; color: #444; line-height: 1.6; margin-bottom: 12px;
+}
+.cv-item:last-child { margin-bottom: 0; }
+.cv-item strong { color: #111; font-weight: 700; margin-right: 4px; }
+
+
+/* Contact Section */
+.email-link {
+    font-size: 2.5rem; font-weight: 700; color: var(--text-primary);
+    letter-spacing: -0.02em; border-bottom: 2px solid transparent;
+    display: inline-block; margin-bottom: 12px;
+}
+.email-link:hover { border-bottom: 2px solid var(--text-primary); opacity: 1; }
+
+.small-email {
+    margin: 0; font-size: 0.95rem; color: #999;
+    font-family: monospace, 'Courier New', Courier;
+    letter-spacing: 0.05em; user-select: all;
+}
+
+
+/* ==========================================================================
+   4. 상세 페이지 (Detail Page Specific)
+   ========================================================================== */
+
+.project-detail { padding-bottom: 100px; }
+
+/* Detail Header */
+.detail-header {
+    margin-bottom: 60px;
+    border-bottom: 1px solid var(--line-color);
+    padding-bottom: 40px;
+}
+.detail-header .category {
+    display: block; color: var(--text-secondary); font-size: 0.9rem;
+    margin-bottom: 10px; font-weight: 500;
+}
+.detail-header h1 {
+    font-size: 3.5rem; margin: 0 0 30px 0;
+    font-weight: 800; line-height: 1.1; letter-spacing: -0.03em;
+}
+
+.meta-info {
+    display: flex; gap: 30px;
+    color: #555; font-size: 0.95rem; font-family: monospace;
+}
+
+/* Detail Content (Description & Credits) */
+.detail-content {
+    display: grid; grid-template-columns: 2fr 1fr; gap: 60px;
+}
+.detail-content h3 {
+    font-size: 1.1rem; margin-bottom: 20px;
+    text-transform: uppercase; letter-spacing: 0.05em; color: #999;
+}
+.description p { font-size: 1.1rem; margin-bottom: 24px; color: #333; line-height: 1.8; }
+.credits ul li {
+    margin-bottom: 10px; font-size: 0.95rem; color: #555;
+    border-bottom: 1px solid #EEE; padding-bottom: 10px;
+}
+.credits strong { color: #222; font-weight: 600; margin-right: 5px; }
+
+
+/* =========================================
+   상세 페이지 미디어 (풀와이드 & 컨테이너)
+   ========================================= */
+
+/* 1. 풀-와이드 상단 슬라이드쇼 */
+.full-width-slider {
+    position: relative; width: 100%; height: 45vh;
+    margin-top: 60px; margin-bottom: 0; /* 미디어 연결을 위해 하단여백 제거 */
+    background-color: #F0F0F0; overflow: hidden;
+}
+.full-slide {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    object-fit: cover; opacity: 0; transition: opacity 1.5s ease-in-out; z-index: 1;
+}
+.full-slide.active { opacity: 1; z-index: 2; }
+
+
+/* 2. 풀-와이드 영상/PDF 컨테이너 (컨테이너 밖) */
+.full-width-media {
+    width: 100%; position: relative; background-color: #000;
+    margin-bottom: 60px; /* 텍스트와의 간격 */
+}
+
+/* 영상 모드 (높이 설정) */
+.full-width-media.video-mode { height: 60vh; }
+
+/* PDF 모드 (높이 및 스타일 설정) */
+.full-width-media.pdf-mode {
+    height: 800px; background-color: #FFF;
+    border-top: 1px solid var(--line-color); border-bottom: 1px solid var(--line-color);
+    margin-top: 30px;
+}
+
+.full-width-media iframe, .full-width-media embed {
+    width: 100%; height: 100%; border: none; display: block;
+}
+
+
+/* 3. 컨테이너 내부 미디어 (Diamond Dust 슬라이드쇼 등) */
+.iframe-wrap.full-size { height: 500px; cursor: default; }
+.detail-media { margin-bottom: 80px; }
+
+/* 컨테이너 내부 슬라이드쇼 */
+.project-slider { position: relative; overflow: hidden; }
+.project-slide {
+    position: absolute; top: 0; left: 0; width: 100%; height: 105%;
+    object-fit: cover; opacity: 0; transition: opacity 1s ease-in-out;
+    background-color: var(--placeholder-bg);
+}
+.project-slide.active { opacity: 1; z-index: 1; }
+
+
+/* =========================================
+   상세 페이지 기타 요소 (PDF, Link, Nav)
+   ========================================= */
+
+/* PDF 제목 섹션 */
+.score-title-section {
+    margin-top: 100px; padding-top: 60px;
+    border-top: 1px solid var(--line-color);
+}
+.score-title-section h3 {
+    font-size: 1.1rem; margin: 0;
+    text-transform: uppercase; letter-spacing: 0.05em; color: #999;
+}
+
+/* PDF 대체 문구 */
+.pdf-fallback {
+    display: none; padding: 20px; text-align: center; font-size: 0.9rem; color: #666;
+}
+noembed { display: block; }
+
+/* 외부 링크 버튼 */
+.external-link-block {
+    margin-top: 40px; padding-top: 30px;
+    border-top: 1px solid var(--line-color);
+}
+.project-outlink {
+    display: inline-block; padding: 15px 25px;
+    background-color: var(--text-primary); color: #FFFFFF !important;
+    font-weight: 600; font-size: 0.95rem; border-radius: 4px;
+    transition: all 0.3s ease;
+}
+.project-outlink:hover {
+    background-color: var(--text-secondary); transform: translateY(-2px);
+}
+
+/* 네비게이션 (이전/다음 프로젝트) */
+.next-project, .previous-project {
+    margin-top: 100px; text-align: right;
+    border-top: 1px solid var(--line-color); padding-top: 40px;
+}
+.next-project a, .previous-project a { font-size: 2rem; font-weight: 700; }
+
+/* 텍스트 컨테이너 상단 여백 (풀와이드 미디어 사용 시) */
+.content-container-wrap { margin-top: 60px; }
+
+
+/* =========================================
+   위로 가기 버튼 (Back to Top)
+   ========================================= */
+.back-to-top {
+    position: fixed; bottom: 30px; right: 30px;
+    width: 50px; height: 50px;
+    background-color: transparent; border: 1px solid #333; border-radius: 50%;
+    display: flex; justify-content: center; align-items: center;
+    text-decoration: none; color: #333; font-size: 1.2rem;
+    opacity: 0; visibility: hidden; transition: all 0.3s ease; z-index: 999;
+}
+.back-to-top.show { opacity: 1; visibility: visible; }
+.back-to-top:hover {
+    background-color: #333; color: #fff; transform: translateY(-3px);
+}
+
+
+/* ==========================================================================
+   5. 모바일 반응형 (Mobile Responsive)
+   ========================================================================== */
+@media (max-width: 768px) {
+    .container { padding: 0 25px; }
+    
+    /* Hero */
+    .hero h1 { font-size: 3.2rem; }
+    
+    /* Works */
+    .work-item { grid-template-columns: 1fr; gap: 20px; }
+    
+    /* About */
+    .about-layout { flex-direction: column-reverse; gap: 40px; }
+    .profile-slider { width: 100%; height: auto; aspect-ratio: 3 / 4; max-height: 400px; }
+    .bio-container { max-width: 100%; }
+    
+    /* CV */
+    .cv-row { flex-direction: column; margin-bottom: 40px; }
+    .cv-year { width: 100%; margin-bottom: 8px; border-bottom: 1px solid #eee; padding-bottom: 4px; }
+    .cv-item { margin-bottom: 15px; }
+    
+    /* Contact */
+    .email-link { font-size: 1.8rem; }
+    
+    /* Detail Page */
+    .detail-header h1 { font-size: 2.2rem; }
+    .meta-info { flex-direction: column; gap: 5px; }
+    
+    .iframe-wrap.full-size { height: 250px; }
+    .detail-content { grid-template-columns: 1fr; gap: 40px; }
+    
+    /* Full Width Media Mobile */
+    .full-width-slider { height: 50vh; }
+    .full-width-media.video-mode { height: 40vh; }
+    .full-width-media.pdf-mode { height: 500px; }
+    
+    /* Back to Top Mobile */
+    .back-to-top {
+        bottom: 20px; right: 20px; width: 40px; height: 40px;
+        font-size: 1rem; background-color: rgba(255, 255, 255, 0.8);
+    }
+}
+
+/* =========================================
+   양쪽 네비게이션 (Previous / Next)
+   ========================================= */
+.project-navigation {
+    margin-top: 80px;
+    padding-top: 40px;
+    border-top: 1px solid var(--line-color); /* 구분선 */
+    display: flex;
+    justify-content: space-between; /* 양쪽 끝으로 밀어내기 */
+    align-items: center;
+    flex-wrap: wrap; /* 모바일에서 글씨가 길면 줄바꿈 */
+    gap: 20px;
+}
+
+.nav-item {
+    font-size: 1.8rem; /* 글자 크기 적당히 */
+    font-weight: 700;
+    color: var(--text-primary);
+    text-decoration: none;
+    transition: opacity 0.3s;
+}
+
+.nav-item:hover {
+    opacity: 0.6;
+}
+
+/* 왼쪽 버튼 (Next Work) */
+.nav-left {
+    text-align: left;
+}
+
+/* 가운데 버튼 (List) */
+.nav-list {
+    text-align: center;
+}
+
+/* 오른쪽 버튼 (Previous Work) */
+.nav-right {
+    text-align: right;
+}
+
+/* 모바일 대응 */
+@media (max-width: 768px) {
+    .project-navigation {
+        margin-top: 60px;
+    }
+    .nav-item {
+        font-size: 1rem; /* 모바일에서는 글자 조금 작게 */
+    }
+}

@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Line - KIM EUNJUN</title>
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+    <style>
+        /* [이 페이지 전용 스타일] */
+        
+        /* 1. 풀와이드 슬라이드쇼 (5초 간격) */
+        .full-width-slider {
+            position: relative;
+            width: 100%;
+            height: 45vh;
+            margin-top: 60px;
+            margin-bottom: 0; 
+            background-color: #F0F0F0;
+            overflow: hidden;
+        }
+
+        .full-slide {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            object-fit: cover;
+            opacity: 0; 
+            transition: opacity 2s ease-in-out;
+            z-index: 1;
+            transform-origin: center center;
+        }
+
+        /* 줌 아웃 모션 */
+        .full-slide.active {
+            opacity: 1;
+            z-index: 2;
+            animation: zoomOut 6s linear infinite;
+        }
+
+        @keyframes zoomOut {
+            0% { transform: scale(1.15); }
+            100% { transform: scale(1.0); }
+        }
+
+        /* 2. 풀와이드 미디어 (SoundCloud 전용) */
+        .full-width-media {
+            width: 100%;
+            position: relative;
+            background-color: #111; /* 사운드클라우드와 어울리는 배경 */
+            margin-bottom: 60px;
+        }
+
+        /* 사운드클라우드 높이 설정 (450px 추천) */
+        .full-width-media.soundcloud-mode {
+            height: 350px; 
+        }
+
+        .full-width-media iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+        }
+
+        /* 텍스트 컨테이너 */
+        .content-container-wrap { margin-top: 60px; }
+
+        /* 네비게이션 */
+        .previous-project {
+            margin-top: 60px; border-top: 1px solid #E5E5E5; padding-top: 40px; text-align: right;
+        }
+        .previous-project a { font-size: 2rem; font-weight: 700; }
+
+        /* 모바일 대응 */
+        @media (max-width: 768px) {
+            .full-width-slider { height: 50vh; }
+            .full-width-media.soundcloud-mode { height: 450px; } 
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="container header-flex">
+            <a href="../index.html" class="logo">KIM EUNJUN.</a>
+            <nav>
+                <a href="../index.html#works">Back to List</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="project-detail">
+        
+        <div class="container">
+            <div class="detail-header">
+                <span class="category">Live Electronics / 4ch Tape</span>
+                <h1>선 線, line</h1>
+                <div class="meta-info">
+                    <span>Year: 2021</span>
+                    <span>Role: Composer & Performer</span>
+                    <span>Venue: KNUA / Ulsan Contemporary Art Festival</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="full-width-slider">
+            <img src="../images/work03.jpeg" alt="Line Performance View 1" class="full-slide active">
+            <img src="../images/work03_1.jpeg" alt="Line Performance View 1" class="full-slide">
+            </div>
+
+        <div class="full-width-media soundcloud-mode">
+
+            <iframe width="100%" 
+            height="300" 
+            scrolling="no" 
+            frameborder="no" 
+            allow="autoplay" 
+            src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/soundcloud%3Atracks%3A1234671817%3Fsecret_token%3Ds-x5Y627ElcHz&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true"></iframe>
+            
+            <div style="font-size: 10px; color: #cccccc;line-break: anywhere;word-break: normal;overflow: hidden;white-space: nowrap;text-overflow: ellipsis; font-family: Interstate,Lucida Grande,Lucida Sans Unicode,Lucida Sans,Garuda,Verdana,Tahoma,sans-serif;font-weight: 100;">
+                <a href="https://soundcloud.com/user-252533540" title="Bill" target="_blank" style="color: #cccccc; text-decoration: none;">Bill</a> · <a href="https://soundcloud.com/user-252533540/line_4ch/s-x5Y627ElcHz" title="선(線, Line)_4ch" target="_blank" style="color: #cccccc; text-decoration: none;">선(線, Line)_4ch</a></div>
+            
+
+        </div>
+
+        <div class="container content-container-wrap">
+            <div class="detail-content">
+                <div class="description">
+                    <h3>The Boundary Between Sound and Silence</h3>
+                    <p>
+                        "선 (Line)" explores the boundaries created by lines—connecting yet separating spaces, sounds, and moments. Utilizing 4-channel tape music and live electronics, the piece investigates the acoustic properties of lines and how they manifest in physical space.
+                    </p>
+                    <p>
+                        The work begins with a single, thin frequency that gradually expands, weaving complex textures through the quadraphonic sound system. The performer interacts with these invisible lines of sound, manipulating their tension and release in real-time.
+                    </p>
+                    <p>
+                        Through the interplay of static noise and fluid tones, "Line" questions the definition of boundaries: Is a line a division, or is it a point of contact? The immersive soundscape invites the audience to perceive the movement of sound as a physical drawing in the air.
+                    </p>
+                </div>
+                
+                <div class="credits">
+                    <h3>Credits</h3>
+                    <ul>
+                        <li><strong>Composition & Performance:</strong> Kim Eunjun</li>
+                        <li><strong>System:</strong> Max8</li>
+                        <li><strong>Performances:</strong>
+                            <br>- 2021 Ulsan Contemporary Art Festival 'Vibrating Boundaries' (4ch Tape)
+                            <br>- 2021 KNUA 'MTK041' (Live Electronics)
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="container"> 
+                <div class="project-navigation">
+                    <a href="project04_axiom.html" class="nav-item nav-left">← Next Work</a>
+                    <a href="../index.html#works" class="nav-item nav-list">List</a>
+                    <a href="project02_doppelganger.html" class="nav-item nav-right">Previous Work →</a>
+            </div>
+        </div>
+
+        </div> 
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 KIM EUNJUN. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const slides = document.querySelectorAll('.full-slide');
+            let currentSlide = 0;
+            // 6초 간격 설정
+            const slideInterval = 6000; 
+
+            // 슬라이드가 2장 이상일 때만 작동
+            if(slides.length > 1) {
+                setInterval(() => {
+                    slides[currentSlide].classList.remove('active');
+                    currentSlide = (currentSlide + 1) % slides.length;
+                    slides[currentSlide].classList.add('active');
+                }, slideInterval);
+            }
+        });
+    </script>
+
+</body>
+</html>

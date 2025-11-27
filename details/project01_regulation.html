@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>REGULATION - KIM EUNJUN</title>
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+    <style>
+        /* [이 페이지 전용 스타일] */
+        
+        /* 1. 풀와이드 슬라이드쇼 (6초 간격, 줌아웃 모션) */
+        .full-width-slider {
+            position: relative;
+            width: 100%;
+            height: 45vh;
+            margin-top: 60px;
+            margin-bottom: 0; 
+            background-color: #F0F0F0;
+            overflow: hidden;
+        }
+
+        .full-slide {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            object-fit: cover;
+            opacity: 0; 
+            transition: opacity 2s ease-in-out;
+            z-index: 1;
+            transform-origin: center center;
+        }
+
+        .full-slide.active {
+            opacity: 1;
+            z-index: 2;
+            animation: zoomOut 6s linear infinite;
+        }
+
+        @keyframes zoomOut {
+            0% { transform: scale(1.05); }
+            100% { transform: scale(1.0); }
+        }
+
+        /* 2. 풀와이드 미디어 (유튜브용) */
+        .full-width-media {
+            width: 100%;
+            position: relative;
+            background-color: #000;
+            margin-bottom: 60px;
+        }
+
+        .full-width-media.video-mode { height: 60vh; }
+
+        .full-width-media iframe {
+            width: 100%; height: 100%; border: none; display: block;
+        }
+
+        /* 텍스트 컨테이너 */
+        .content-container-wrap { margin-top: 60px; }
+
+        /* 네비게이션 */
+        .previous-project {
+            margin-top: 60px; border-top: 1px solid #E5E5E5; padding-top: 40px; text-align: right;
+        }
+        .previous-project a { font-size: 2rem; font-weight: 700; }
+
+        /* 모바일 대응 */
+        @media (max-width: 768px) {
+            .full-width-slider { height: 50vh; }
+            .full-width-media.video-mode { height: 40vh; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="container header-flex">
+            <a href="../index.html" class="logo">KIM EUNJUN.</a>
+            <nav>
+                <a href="../index.html#works">Back to List</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="project-detail">
+        
+        <div class="container">
+            <div class="detail-header">
+                <span class="category">Audio-visual</span>
+                <h1>REGULATION</h1>
+                <div class="meta-info">
+                    <span>Year: 2020 / 2024</span>
+                    <span>Role: Sound & Visual</span>
+                    <span>Venue: Nemaf 2020 / Arts Korea Lab</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="full-width-slider">
+            <img src="../images/work01.png" alt="REGULATION View 1" class="full-slide active">
+            <img src="../images/work01_1.jpg" alt="REGULATION View 2" class="full-slide">
+            <img src="../images/work01_2.jpg" alt="REGULATION View 3" class="full-slide">
+            <img src="../images/work01_3.png" alt="REGULATION View 3" class="full-slide">
+        </div>
+
+        <div class="full-width-media video-mode">
+            <iframe 
+                src="https://www.youtube.com/embed/eBWpmoyZi6E?rel=0&modestbranding=1" 
+                title="REGULATION Video" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                allowfullscreen>
+            </iframe>
+        </div>
+
+        <div class="container content-container-wrap">
+            <div class="detail-content">
+                <div class="description">
+                    <h3>Exploring the Boundaries of Control and Chaos</h3>
+                    <p>
+                        "REGULATION" is an audiovisual work that delves into the concept of control within a system. Through real-time generated visuals and sound, the piece examines how strict rules (regulations) can both create order and incite chaos.
+                    </p>
+                    <p>
+                        The visual elements are governed by a set of algorithms that dictate their movement, color, and form. As the piece progresses, these regulations are manipulated—tightened to create rigid, geometric structures, or loosened to allow for organic, unpredictable motion.
+                    </p>
+                    <p>
+                        The soundscape parallels this visual evolution. Synthesized textures shift from rhythmic, mechanical precision to dissonant, ambient noise, reflecting the tension between system stability and entropy. The work invites the audience to question the nature of rules: do they protect us, or do they confine us?
+                    </p>
+                </div>
+                
+                <div class="credits">
+                    <h3>Credits</h3>
+                    <ul>
+                        <li><strong>Composition & Visuals:</strong> Kim EunJun</li>
+                        <li><strong>System:</strong> Max8</li>
+                        <li><strong>Performances:</strong>
+                            <br>- 2024 Arts Korea Lab Festival, Seoul
+                            <br>- 2020 The 20th Seoul Int'l ALT Cinema & Media Festival (Nemaf2020), Seoul
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="container"> 
+                <div class="project-navigation">
+                    <a href="project02_doppelganger.html" class="nav-item nav-left">← Next Work</a>
+                    <a href="../index.html#works" class="nav-item nav-list">List</a>
+                    <a href="project02_doppelganger.html" class="nav-item nav-right"></a>
+                    <a href="project02_doppelganger.html" class="nav-item nav-right"></a>
+                </div>
+        </div>
+        </div>
+
+        </div> 
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 KIM EUNJUN. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const slides = document.querySelectorAll('.full-slide');
+            let currentSlide = 0;
+            const slideInterval = 6000; 
+
+            if(slides.length > 1) {
+                setInterval(() => {
+                    slides[currentSlide].classList.remove('active');
+                    currentSlide = (currentSlide + 1) % slides.length;
+                    slides[currentSlide].classList.add('active');
+                }, slideInterval);
+            }
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Island Air - KIM EUNJUN</title>
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+    <style>
+        /* [이 페이지 전용 스타일] 풀와이드 슬라이드쇼 */
+        
+        .full-width-slider {
+            position: relative;
+            width: 100%;
+            height: 45vh; /* 화면 높이의 75%만큼 꽉 차게 (원하면 조절 가능) */
+            margin-top: 60px;
+            margin-bottom: 60px;
+            background-color: #F0F0F0;
+            overflow: hidden;
+        }
+
+        .full-slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* 비율 유지하며 꽉 채우기 */
+            opacity: 0; /* 기본적으로 투명 */
+            transition: opacity 1.5s ease-in-out; /* 1.5초 동안 서서히 변함 */
+            z-index: 1;
+        }
+
+        /* 활성화된 슬라이드만 보임 */
+        .full-slide.active {
+            opacity: 1;
+            z-index: 2;
+        }
+
+        /* 텍스트 내용과의 간격 */
+        .content-container-wrap {
+            margin-top: 0;
+        }
+
+        /* 모바일에서는 높이를 좀 줄임 */
+        @media (max-width: 768px) {
+            .full-width-slider {
+                height: 50vh; 
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="container header-flex">
+            <a href="index.html" class="logo">KIM EUNJUN.</a>
+            <nav>
+                <a href="index.html#works">Back to List</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="project-detail">
+        
+        <div class="container">
+            <div class="detail-header">
+                <span class="category">Audiovisual / Data Sonification</span>
+                <h1>Island Air</h1>
+                <div class="meta-info">
+                    <span>Year: 2023</span>
+                    <span>Role: Sound & Visual</span>
+                    <span>Venue: Nodeul Island Art Space</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="full-width-slider">
+            <img src="../images/work07_islandAir_1.png" alt="Island Air View 1" class="full-slide active">
+            <img src="../images/work07.png" alt="Island Air View 2" class="full-slide">
+            <img src="../images/work07_islandAir_2.png" alt="Island Air View 2" class="full-slide">
+        </div>
+
+        <div class="container content-container-wrap">
+            <div class="detail-content">
+                <div class="description">
+                    <h3>Audiovisual Using Real-Time Climate Data</h3>
+                    <p>
+                        This project is a form of data sonification that transforms real-time air quality data from Nodeul Island, Seoul, into an evolving audiovisual artwork. By communicating with an API server, the system receives daily air quality metrics and translates them into both sound and visual elements.
+                    </p>
+                    <p>
+                        The piece responds to these fluctuations in real time:
+                    </p>
+                    <p>
+                        On days with <strong>clear air</strong>, the visual palette becomes bright and open, and the sound is clean—built from waveforms with minimal overtones, evoking a sense of clarity and calm.
+                    </p>
+                    <p>
+                        On days with <strong>high levels of fine dust (PM2.5)</strong>, which are common during spring and winter in South Korea due to transboundary pollution and seasonal patterns, the work shifts drastically. The visuals darken, textures become turbulent, and the sound becomes noisier and more complex, filled with rich partials and distortion.
+                    </p>
+                    <p>
+                        As the environment changes, so does the piece—never repeating the same way twice. The work functions as a daily environmental diary, capturing invisible yet palpable shifts in our atmosphere, and drawing attention to the increasingly unstable nature of urban air quality. It invites reflection on how climate and pollution—often abstract or unseen—can be perceived emotionally and viscerally through art.
+                    </p>
+                </div>
+                
+                <div class="credits">
+                    <h3>Credits</h3>
+                    <ul>
+                        <li><strong>Sound & Visual:</strong> Kim Eunjun</li>
+                        <li><strong>System:</strong> Max8 (Cycling '74)</li>
+                        <li><strong>Data Source:</strong> Real-time Air Quality API (Nodeul Island)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="container"> 
+                <div class="project-navigation">
+                    <a href="project08_diamondDust.html" class="nav-item nav-left">← Next Work</a>
+                    <a href="../index.html#works" class="nav-item nav-list">List</a>
+                    <a href="project06_datenprotokoll.html" class="nav-item nav-right">Previous Work →</a>
+            </div>
+
+        </div> </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 KIM EUNJUN. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const slides = document.querySelectorAll('.full-slide');
+            let currentSlide = 0;
+            const slideInterval = 3000; // 3초
+
+            if(slides.length > 1) {
+                setInterval(() => {
+                    // 현재 이미지 숨김
+                    slides[currentSlide].classList.remove('active');
+                    
+                    // 다음 순서 계산
+                    currentSlide = (currentSlide + 1) % slides.length;
+                    
+                    // 다음 이미지 표시
+                    slides[currentSlide].classList.add('active');
+                }, slideInterval);
+            }
+        });
+    </script>
+
+</body>
+</html>
