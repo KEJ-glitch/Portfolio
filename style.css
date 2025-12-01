@@ -18,7 +18,7 @@ body {
     color: var(--text-primary);
     font-weight: 300;
     line-height: 1.6;
-    letter-spacing: -0.02em;
+    letter-spacing: -0.01em;
 }
 
 a { text-decoration: none; color: inherit; transition: opacity 0.3s; }
@@ -28,7 +28,7 @@ ul { padding: 0; list-style: none; }
 p { margin: 0 0 20px 0; }
 
 .container {
-    max-width: 900px;
+    max-width: 1250px;
     margin: 0 auto;
     padding: 0 40px;
 }
@@ -497,6 +497,6 @@ noembed { display: block; }
         margin-top: 60px;
     }
     .nav-item {
-        font-size: 1rem; /* 모바일에서는 글자 조금 작게 */
+        font-size: 0.8rem; /* 모바일에서는 글자 조금 작게 */
     }
 }
