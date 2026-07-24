@@ -79,7 +79,19 @@ footer { padding: 80px 0; color: #AAA; font-size: 0.8rem; text-align: right; }
    ========================================================================== */
 
 /* Hero Section */
-.hero { padding: 100px 0 180px; }
+.hero { padding: 100px 0 180px; position: relative; overflow: hidden; }
+
+.hero-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.hero .container { position: relative; z-index: 1; }
 
 .hero h1 {
     font-size: 5rem;
@@ -150,6 +162,25 @@ footer { padding: 80px 0; color: #AAA; font-size: 0.8rem; text-align: right; }
 
 .work-link:hover .work-thumb {
     transform: scale(1.08);
+}
+
+/* 이미지 전체가 보이도록 (crop 없이), 남는 여백은 같은 이미지를 확대·반투명하게 겹쳐서 채움 */
+.iframe-wrap.contain-thumb {
+    position: relative;
+    background-color: #FFFFFF;
+}
+.iframe-wrap.contain-thumb .work-thumb-bg {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+    transform: scale(1.15);
+    opacity: 0.4;
+}
+.iframe-wrap.contain-thumb .work-thumb {
+    position: relative;
+    z-index: 1;
+    object-fit: contain;
 }
 
 .placeholder { color: #999; font-size: 0.85rem; font-weight: 500; letter-spacing: 0.05em; }
@@ -257,9 +288,17 @@ footer { padding: 80px 0; color: #AAA; font-size: 0.8rem; text-align: right; }
 
 /* Detail Header */
 .detail-header {
+    position: relative;
+    overflow: hidden;
     margin-bottom: 60px;
     border-bottom: 1px solid var(--line-color);
     padding-bottom: 40px;
+}
+.detail-header .category,
+.detail-header h1,
+.detail-header .meta-info {
+    position: relative;
+    z-index: 1;
 }
 .detail-header .category {
     display: block; color: var(--text-secondary); font-size: 0.9rem;
@@ -284,6 +323,21 @@ footer { padding: 80px 0; color: #AAA; font-size: 0.8rem; text-align: right; }
     text-transform: uppercase; letter-spacing: 0.05em; color: #999;
 }
 .description p { font-size: 1.1rem; margin-bottom: 24px; color: #333; line-height: 1.8; }
+
+/* 커미션 / 헌정 노트 */
+.commission-note {
+    font-size: 0.95rem; font-style: italic; color: var(--text-secondary);
+    border-left: 2px solid #ccc; padding-left: 14px; margin-bottom: 40px;
+}
+.commission-note .commission-note-kr { display: block; margin-top: 4px; }
+
+/* 프로그램 노트 내 언어 구분 / 악장 소제목 (About 섹션의 lang-title 재사용) */
+.description .lang-title { margin-top: 40px; }
+.description .lang-title:first-of-type { margin-top: 0; }
+.description .movement-title {
+    font-size: 1rem; font-weight: 700; color: var(--text-primary);
+    margin: 30px 0 12px;
+}
 .credits ul li {
     margin-bottom: 10px; font-size: 0.95rem; color: #555;
     border-bottom: 1px solid #EEE; padding-bottom: 10px;

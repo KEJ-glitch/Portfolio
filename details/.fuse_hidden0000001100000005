@@ -86,7 +86,6 @@
                 src="https://www.youtube.com/embed/-XMb2tGPM-4?rel=0&modestbranding=1" 
                 title="Axiom 2 Performance Video" 
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                referrerpolicy="strict-origin-when-cross-origin"
                 allowfullscreen>
             </iframe>
         </div>

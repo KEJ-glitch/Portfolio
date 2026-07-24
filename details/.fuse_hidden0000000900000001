@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>Axiom - KIM EUNJUN</title>
+    <title>REGULATION - KIM EUNJUN</title>
     
     <link rel="icon" href="../images/favicon.png" type="image/x-icon">
     
@@ -19,13 +19,13 @@
 </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Axiom - KIM EUNJUN</title>
+    <title>REGULATION - KIM EUNJUN</title>
     <link rel="stylesheet" href="../style.css">
     <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
     <style>
-        /* [이 페이지 전용 스타일] 풀와이드 미디어 & 모션 */
+        /* [이 페이지 전용 스타일] */
         
-        /* 1. 풀와이드 슬라이드쇼 */
+        /* 1. 풀와이드 슬라이드쇼 (6초 간격, 줌아웃 모션) */
         .full-width-slider {
             position: relative;
             width: 100%;
@@ -41,23 +41,19 @@
             top: 0; left: 0; width: 100%; height: 100%;
             object-fit: cover;
             opacity: 0; 
-            transition: opacity 2s ease-in-out; /* 부드러운 페이드 효과 */
+            transition: opacity 2s ease-in-out;
             z-index: 1;
             transform-origin: center center;
         }
 
-        /* 
-        활성화 시: 보임 + 줌아웃 애니메이션 실행 
         .full-slide.active {
             opacity: 1;
             z-index: 2;
-            animation: zoomOut 15s linear infinite; /* 천천히 줌아웃 */
-        
-        /*
+            animation: zoomOut 6s linear infinite;
+        }
 
-        /* 줌아웃 키프레임 (누락된 부분 추가됨) */
         @keyframes zoomOut {
-            0% { transform: scale(1.15); }
+            0% { transform: scale(1.05); }
             100% { transform: scale(1.0); }
         }
 
@@ -107,29 +103,28 @@
         <div class="container">
             <div class="detail-header">
                 <canvas class="hero-canvas" data-density="0.45" aria-hidden="true"></canvas>
-                <span class="category">Audio-visual / Media Art</span>
-                <h1>Axiom</h1>
+                <span class="category">Audio-visual</span>
+                <h1>REGULATION</h1>
                 <div class="meta-info">
-                    <span>Year: 2021 / 2022</span>
-                    <span>Role: Composer</span>
-                    <span>Venue: Bremen HfK / fest-m 2022 / MTK042</span>
+                    <span>Year: 2020 / 2024</span>
+                    <span>Role: Sound & Visual</span>
+                    <span>Venue: Nemaf 2020 / Arts Korea Lab</span>
                 </div>
             </div>
         </div>
 
         <div class="full-width-slider">
-            <img src="../images/work04.png" alt="Axiom Performance View 1" class="full-slide active">
-            <img src="../images/work04_1.jpeg" alt="Axiom Performance View 2" class="full-slide">
-            <img src="../images/work04_2.png" alt="Axiom Performance View 3" class="full-slide">
-            <img src="../images/work04_3.png" alt="Axiom Performance View 4" class="full-slide">
+            <img src="../images/work01.png" alt="REGULATION View 1" class="full-slide active">
+            <img src="../images/work01_1.jpg" alt="REGULATION View 2" class="full-slide">
+            <img src="../images/work01_2.jpg" alt="REGULATION View 3" class="full-slide">
+            <img src="../images/work01_3.png" alt="REGULATION View 3" class="full-slide">
         </div>
 
         <div class="full-width-media video-mode">
             <iframe 
-                src="https://www.youtube.com/embed/VIDEO_ID_HERE?rel=0&modestbranding=1" 
-                title="Axiom Performance Video" 
+                src="https://www.youtube.com/embed/eBWpmoyZi6E?rel=0&modestbranding=1" 
+                title="REGULATION Video" 
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                referrerpolicy="strict-origin-when-cross-origin"
                 allowfullscreen>
             </iframe>
         </div>
@@ -137,18 +132,15 @@
         <div class="container content-container-wrap">
             <div class="detail-content">
                 <div class="description">
-                    <h3>Systematic Growth and Disintegration</h3>
+                    <h3>Exploring the Boundaries of Control and Chaos</h3>
                     <p>
-                        "Axiom" is an audiovisual performance that explores the structural aesthetics of algorithmic growth. The work is built upon the L-system (Lindenmayer system), a mathematical formalism used to model the growth processes of plants. By translating these recursive rules into both visual geometry and sonic texture, the piece creates a synesthetic experience of an artificial organism evolving in real time.
+                        "REGULATION" is an audiovisual work that delves into the concept of control within a system. Through real-time generated visuals and sound, the piece examines how strict rules (regulations) can both create order and incite chaos.
                     </p>
                     <p>
-                        The visual elements begin as simple geometric primitives but rapidly expand into complex, branching structures. These forms do not merely grow; they mutate, glitch, and occasionally collapse under their own complexity. The system governs everything from the angle of the branches to the density of the particles, creating a visual language that feels both organic and strictly computational.
+                        The visual elements are governed by a set of algorithms that dictate their movement, color, and form. As the piece progresses, these regulations are manipulated—tightened to create rigid, geometric structures, or loosened to allow for organic, unpredictable motion.
                     </p>
                     <p>
-                        Sonically, the piece mirrors this process. The initial sounds are pure sine waves and simple impulses, representing the 'seed' or the 'axiom' of the system. As the visual structure becomes more intricate, the sound synthesis follows suit—layering harmonics, introducing granular noise, and manipulating the stereo field to match the expanding visual space. The result is a tight, reactive interplay where sound and image are not just synchronized, but generated from the same underlying data stream.
-                    </p>
-                    <p>
-                        Ultimately, "Axiom" questions the boundary between the natural and the artificial. By using a mathematical code designed to simulate nature, the performance reveals the beauty inherent in logic and the chaos that can emerge from order.
+                        The soundscape parallels this visual evolution. Synthesized textures shift from rhythmic, mechanical precision to dissonant, ambient noise, reflecting the tension between system stability and entropy. The work invites the audience to question the nature of rules: do they protect us, or do they confine us?
                     </p>
                 </div>
                 
@@ -156,11 +148,10 @@
                     <h3>Credits</h3>
                     <ul>
                         <li><strong>Composition & Visuals:</strong> Kim EunJun</li>
-                        <li><strong>System:</strong> Visual: Max8<br>Sound: SuperCollider</li>
+                        <li><strong>System:</strong> Max8</li>
                         <li><strong>Performances:</strong>
-                            <br>- 2022 HfK Bremen 'KOREANISCHE PERSPEKTIVEN', Germany
-                            <br>- 2022 fest-m, Seoul
-                            <br>- 2021 KNUA 'MTK042', Seoul
+                            <br>- 2024 Arts Korea Lab Festival, Seoul
+                            <br>- 2020 The 20th Seoul Int'l ALT Cinema & Media Festival (Nemaf2020), Seoul
                         </li>
                     </ul>
                 </div>
@@ -168,10 +159,13 @@
 
             <div class="container"> 
                 <div class="project-navigation">
-                    <a href="project05_interrupt.html" class="nav-item nav-left">← Next Work</a>
+                    <a href="project02_doppelganger.html" class="nav-item nav-left">← Next Work</a>
                     <a href="../index.html#works" class="nav-item nav-list">List</a>
-                    <a href="project03_line.html" class="nav-item nav-right">Previous Work →</a>
-            </div>
+                    <a href="project02_doppelganger.html" class="nav-item nav-right"></a>
+                    <a href="project02_doppelganger.html" class="nav-item nav-right"></a>
+                </div>
+        </div>
+        </div>
 
         </div> 
     </main>
@@ -186,18 +180,12 @@
         document.addEventListener("DOMContentLoaded", function() {
             const slides = document.querySelectorAll('.full-slide');
             let currentSlide = 0;
-            // 4초 간격 설정
-            const slideInterval = 4000; 
+            const slideInterval = 6000; 
 
             if(slides.length > 1) {
                 setInterval(() => {
-                    // 현재 이미지 숨김
                     slides[currentSlide].classList.remove('active');
-                    
-                    // 다음 순서 계산
                     currentSlide = (currentSlide + 1) % slides.length;
-                    
-                    // 다음 이미지 표시
                     slides[currentSlide].classList.add('active');
                 }, slideInterval);
             }

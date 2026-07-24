@@ -37,6 +37,7 @@
     </header>
 
     <section class="hero">
+        <canvas id="heroWave" class="hero-canvas" aria-hidden="true"></canvas>
         <div class="container">
             <p class="subtitle">Composer & Sound Artist</p>
             <h1>SOUND<br>TECHNOLOGY<br>ART.</h1>
@@ -51,6 +52,21 @@
             <h2 class="section-title">WORKS</h2>
             
             <div class="work-list">
+                <a href="details/project11_sequential.html" class="work-link">
+                    <div class="work-item">
+                        <div class="work-text">
+                            <h3>Sequential</h3>
+                            <h5>for Quartet and Live Electronics</h5>
+                            <p>[Electro-acoustic]</p>
+                            <span class="year">2026</span>
+                        </div>
+                        <div class="iframe-wrap hover-effect contain-thumb">
+                            <img src="images/work11.jpeg" alt="" class="work-thumb-bg" aria-hidden="true">
+                            <img src="images/work11.jpeg" alt="Sequential" class="work-thumb">
+                        </div>
+                    </div>
+                </a>
+
                 <a href="details/project10_lucid.html" class="work-link">
                     <div class="work-item">
                         <div class="work-text">
@@ -308,14 +324,14 @@
                     <div class="cv-row">
                         <div class="cv-year">2026</div>
                         <div class="cv-content">
-                            <div class="cv-item"><strong>AI Robot Opera</strong> | 'Sequential' for Quartet and Live Electronics, Nam June Paik Art Center, Seoul</div>
+                            <div class="cv-item"><strong>AI Robot Opera</strong> | 'Sequential' for Quartet and Live Electronics, Nam June Paik Art Center, Yongin</div>
                         </div>
                     </div>
                     
                     <div class="cv-row">
                         <div class="cv-year">2025</div>
                         <div class="cv-content">
-                            <div class="cv-item"><strong>AI Robot Opera <span style="font-size: 0.8em; vertical-align: middle; letter-spacing: 0.05em;">pre-opening</span></strong> | 'Sequential' for Viola, Piano and Live Electronics, Nam June Paik Art Center, Seoul</div>
+                            <div class="cv-item"><strong>AI Robot Opera <span style="font-size: 0.8em; vertical-align: middle; letter-spacing: 0.05em;">pre-opening</span></strong> | 'Sequential' for Viola, Piano and Live Electronics, Nam June Paik Art Center, Yongin</div>
                             <div class="cv-item"><strong>SICMF 2025</strong> | 'Lucid' for Piano and Live Electronics, CKL Stage, Seoul</div>
                         </div>
                     </div>
@@ -409,6 +425,8 @@
             <p>&copy; 2025 KIM EUNJUN. All rights reserved.</p>
         </div>
     </footer>
+
+    <script src="wave-bg.js"></script>
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {

@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>Sequential - KIM EUNJUN</title>
+
+    <link rel="icon" href="../images/favicon.png" type="image/x-icon">
+
+    <link rel="stylesheet" href="../style.css">
+    </head>
+    <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-4T91PWLKF4"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-4T91PWLKF4');
+</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+    <style>
+        /* [풀-와이드 미디어 스타일] */
+        .full-width-media {
+            width: 100%;
+            position: relative;
+            background-color: #000;
+            margin-bottom: 60px;
+        }
+
+        /* 영상 높이 설정 (시네마틱 비율) */
+        .full-width-media.video-mode {
+            height: 60vh; /* 화면 높이의 60% */
+        }
+
+        /* 상단 커버 배너 (로봇/피아노 일러스트) */
+        .full-width-media.image-mode {
+            height: 50vh;
+            margin-top: 60px; /* 헤더와의 간격 */
+            margin-bottom: 0; /* 바로 아래 영상과 간격 없이 붙임 */
+        }
+        .full-width-media.image-mode img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        /* PDF 높이 설정 */
+        .full-width-media.pdf-mode {
+            height: 800px;
+            background-color: #FFF;
+            border-top: 1px solid #E5E5E5;
+            border-bottom: 1px solid #E5E5E5;
+            margin-top: 30px;
+        }
+
+        .full-width-media iframe,
+        .full-width-media embed {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+        }
+
+        /* 텍스트 컨테이너 간격 */
+        .content-container-wrap {
+            margin-top: 60px;
+        }
+
+        /* PDF 제목 섹션 */
+        .score-title-section {
+            margin-top: 100px;
+            padding-top: 60px;
+            border-top: 1px solid #E5E5E5;
+        }
+        .score-title-section h3 {
+            font-size: 1.1rem; margin: 0;
+            text-transform: uppercase; letter-spacing: 0.05em; color: #999;
+        }
+
+        @media (max-width: 768px) {
+            .full-width-media.video-mode { height: 40vh; }
+            .full-width-media.image-mode { height: 32vh; }
+            .full-width-media.pdf-mode { height: 500px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="container header-flex">
+            <a href="../index.html" class="logo">김은준 KIM EUNJUN.</a>
+            <nav>
+                <a href="../index.html#works">Back to List</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="project-detail">
+
+        <div class="container">
+            <div class="detail-header">
+                <canvas class="hero-canvas" data-density="0.45" aria-hidden="true"></canvas>
+                <span class="category">for Quartet and Live Electronics</span>
+                <h1>Sequential</h1>
+                <div class="meta-info">
+                    <span>Year: 2026</span>
+                    <span>Role: Composer & Piano</span>
+                    <span>Venue: Nam June Paik Art Center, Yongin</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="full-width-media image-mode">
+            <img src="../images/work11_0.png" alt="Sequential — Robot at the Piano">
+        </div>
+
+        <div class="full-width-media video-mode">
+            <iframe
+                src="https://www.youtube.com/embed/o9Kglm7_kO8?rel=0&modestbranding=1"
+                title="Sequential Performance Video"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen>
+            </iframe>
+        </div>
+
+        <div class="container content-container-wrap">
+            <div class="detail-content">
+                <div class="description">
+                    <p class="commission-note">
+                        This work was composed for the 20th anniversary commemorative event marking the passing of Nam June Paik.
+                        <span class="commission-note-kr">이 작품은 백남준 서거 20주기를 위해 작곡되었습니다.</span>
+                    </p>
+
+                    <h3>Program Note</h3>
+
+                    <div class="bio-text">
+                        <h4 class="lang-title">English</h4>
+                        <p>
+                            Sequential is an electro-acoustic work in three movements built on the formal framework of Mozart's Piano Concerto No. 18 in B♭ major, K.456. The movements are reordered as 1–3–2, re-hearing the concerto's bright exterior and its fragile, lyrical interior through a newly designed temporal flow — less an "arrangement" than a reconstruction of the same material through the language of another era: electronic music, serial organization, and timbre-centered composition.
+                        </p>
+                        <p>
+                            The title works on two levels: a sense of continuity running from Mozart's K.456 to Nam June Paik's robot K-456 and on to this electro-acoustic work, and a compositional method organized around order and rule — pitch rows, rhythmic patterns, structural segmentation. Acoustic instruments carry the visible, physical layer of the piece — attack, breath, bow friction — while live electronics and multichannel spatialization reveal what instruments alone cannot: residual memory, fragility, mechanical instability, echoing the imperfection and event-like character of K-456 itself.
+                        </p>
+                        <p>
+                            <strong>Movement I</strong> lays the groundwork through short, driving rhythmic cells drawn from Mozart's own pitch material (B♭, F, D♭, C), organized by serial rule rather than improvisation — contemporary on the surface, Classical at its core. <strong>Movement II</strong> shifts from pitch to texture, built from non-pitched sound and extended techniques — col legno, bow friction, percussive attack — translating the rhythmic drive of Movement I into gesture and surface. <strong>Movement III</strong> is shaped from an AI-generated structural draft, edited and reconfigured by the composer, staging the meeting point of lyrical affect and generative technology — an exposed skeleton to which the composer's choices give form, echoing K-456's own fragility.
+                        </p>
+                        <p>
+                            Sequential does not reproduce Mozart's concerto "as is." It extracts rhythmic energy, phrase structure, and movement-to-movement contrast, reassembling them through electronic transformation — carrying forward the eventfulness and fragility of Paik's K-456 as the work's aesthetic core.
+                        </p>
+                    </div>
+
+                    <div class="bio-text korean-ver">
+                        <h4 class="lang-title">Korean</h4>
+                        <p>
+                            《Sequential》은 모차르트 Piano Concerto No.18 in B♭ major, K.456의 형식적 틀을 출발점으로 삼은 3악장 구성의 Electro-acoustic 작품이다. 악장 순서를 1–3–2로 재배열해 원곡의 밝은 외형과 그 이면의 서정·취약성을 새로운 시간의 흐름으로 다시 들려준다. 핵심은 "편곡"이 아니라, 같은 재료를 전자음악·총렬적 조직·음색 중심의 구성이라는 다른 시대의 언어로 재구성하는 데 있다.
+                        </p>
+                        <p>
+                            제목은 두 층위에서 작동한다. 모차르트의 K.456에서 백남준의 로봇 K-456, 그리고 오늘의 electro-acoustic 작업으로 이어지는 연속성의 감각, 그리고 음열·리듬 패턴·구조적 분절을 중심으로 조직되는 작곡 방식 자체다. 피아노와 현악기가 타격·호흡·활의 마찰 같은 가시적 층을 대표한다면, 라이브 전자음악과 멀티채널 확산은 악기만으로 도달할 수 없는 비가시적 층 — 기억의 잔향, 취약성, 기계적 흔들림 — 을 드러내며 로봇 K-456이 지닌 불완전함과 사건성을 반영한다.
+                        </p>
+                        <p>
+                            <strong>1악장</strong>은 모차르트 K.456에서 관찰되는 B♭, F, D♭, C 등의 음을 재료로, 짧고 추진력 있는 리듬 셀을 중심으로 전개된다. 즉흥이 아닌 음열과 규칙에 따른 총렬적 구조로, 겉은 현대적이지만 내부엔 고전의 질서가 흐르는 이중 구조를 형성한다. <strong>2악장</strong>은 정확한 음고 대신 col legno, 활 마찰, 타악적 어택 등 특수주법과 텍스처를 중심으로 전개되며, 1악장의 리듬 에너지를 제스처와 표면의 언어로 전환한다. <strong>3악장</strong>은 AI가 생성한 구조적 초안을 작곡가가 선택·편집·재구성해 완성한 악장으로, 서정적 감정과 생성 기술이 교차하는 지점을 드러내며 로봇 K-456의 연약함과도 공명한다.
+                        </p>
+                        <p>
+                            《Sequential》은 모차르트의 협주곡을 그대로 재현하지 않는다. 리듬의 에너지, 프레이즈의 조직, 악장 간 대비라는 핵심 원리를 추출해 전자음악적 변형으로 재조립하며, 그 과정에서 로봇 K-456이 상기시키는 사건성과 취약성이 작품의 미학적 배경으로 스며든다.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="credits">
+                    <h3>Credits</h3>
+                    <ul>
+                        <li><strong>Composer & Piano:</strong> Kim Eunjun</li>
+                        <li><strong>Viola:</strong> Byun Jeongin</li>
+                        <li><strong>Cello:</strong> Yoon Seokwoo</li>
+                        <li><strong>Flute:</strong> Seung Kyounghoon</li>
+                        <li><strong>Performance:</strong>
+                            <br>- 2026 AI Robot Opera 'Sequential', Nam June Paik Art Center, Yongin
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div> <div class="container score-title-section">
+            <h3>Score Preview</h3>
+        </div>
+
+        <div class="full-width-media pdf-mode">
+            <embed src="../files/Sequential_Score.pdf#toolbar=0&navpanes=0&scrollbar=0" type="application/pdf" />
+
+            <p class="pdf-fallback" style="text-align: center; padding: 20px;">
+                PDF 뷰어를 지원하지 않는 브라우저입니다.
+            </p>
+        </div>
+
+        <div class="container">
+            <div class="project-navigation">
+                <a href="../index.html#works" class="nav-item nav-list">List</a>
+                <a href="project10_lucid.html" class="nav-item nav-right">Previous Work →</a>
+            </div>
+        </div>
+
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 KIM EUNJUN. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="../wave-bg.js"></script>
+
+</body>
+</html>
