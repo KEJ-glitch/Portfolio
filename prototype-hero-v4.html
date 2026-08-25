@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>[프로토타입 v4] Interference Field</title>
+
+    <link rel="icon" href="images/favicon.png" type="image/x-icon">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+
+    <style>
+        html, body { overflow-x: hidden; }
+
+        .hero { padding: 140px 0 220px; overflow: hidden; }
+        .hero .container { position: relative; z-index: 2; }
+
+        /* 히어로 설명은 style.css 의 .description 을 그대로 씁니다 */
+
+        /* ---------- 튜닝 패널 ---------- */
+        .proto-panel {
+            position: fixed; right: 24px; bottom: 24px; z-index: 9999;
+            width: 268px; padding: 18px 20px;
+            background: rgba(255,255,255,0.93); backdrop-filter: blur(10px);
+            border: 1px solid var(--line-color); border-radius: 10px;
+            font-size: 0.8rem; box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+        }
+        .proto-panel h4 {
+            margin: 0 0 14px; font-size: 0.7rem; letter-spacing: 0.09em;
+            text-transform: uppercase; color: var(--text-secondary);
+        }
+        .proto-row { margin-bottom: 13px; }
+        .proto-row:last-child { margin-bottom: 0; }
+        .proto-row label {
+            display: block; margin-bottom: 5px;
+            color: var(--text-secondary); font-size: 0.74rem;
+        }
+        .proto-row input[type=range] { width: 100%; }
+        .proto-note {
+            margin-top: 14px; padding-top: 12px;
+            border-top: 1px solid var(--line-color);
+            font-size: 0.7rem; color: #999; line-height: 1.6;
+        }
+        @media (max-width: 900px) {
+            .proto-panel { right: 12px; left: 12px; bottom: 12px; width: auto; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="container header-flex">
+            <a href="index.html" class="logo">김은준 KIM EUNJUN.</a>
+            <nav>
+                <a href="prototype-hero-v3.html">v3</a>
+                <a href="index.html">← Site</a>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero">
+        <canvas id="heroCanvas" class="hero-canvas" aria-hidden="true"></canvas>
+        <div class="container">
+            <p class="subtitle">Composer &amp; Sound Artist</p>
+            <h1>SOUND<br>TECHNOLOGY<br>ART.</h1>
+            <div class="divider"></div>
+            <p class="description">
+                Exploring new sensibilities <br>in technology and art through sound —
+                <br>and how a space comes to be filled by it.
+            </p>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            <h2 class="section-title">NOTES</h2>
+            <p class="description" style="max-width:660px">
+                세 개의 음원에서 나온 파동이 겹치며 만드는 간섭 무늬입니다.
+                선으로 그리지 않고 밀도장으로 계산한 뒤 확대해서, 도표가 아니라 질감으로 읽히게 했습니다.
+            </p>
+        </div>
+    </section>
+
+    <div class="proto-panel">
+        <h4>Interference — Tune</h4>
+        <div class="proto-row">
+            <label>Density <span id="vDen">1.00</span></label>
+            <input type="range" id="density" min="0.3" max="2.2" step="0.05" value="1">
+        </div>
+        <div class="proto-row">
+            <label>Wavelength <span id="vWave">1.00</span></label>
+            <input type="range" id="wave" min="0.5" max="2.4" step="0.05" value="1">
+        </div>
+        <div class="proto-row">
+            <label>Softness <span id="vSoft">6</span></label>
+            <input type="range" id="soft" min="3" max="12" step="1" value="6">
+        </div>
+        <div class="proto-row">
+            <label>Grain <span id="vGrain">1.0</span></label>
+            <input type="range" id="grain" min="0" max="2.5" step="0.1" value="1">
+        </div>
+        <div class="proto-note" id="note"></div>
+    </div>
+
+<script>
+/* ==============================================================
+   그레인 타일 (v2·v3 와 동일한 방식)
+   ============================================================== */
+const GRAIN = { block: 3, tile: null, size: 0 };
+(function buildGrain(block) {
+    const size = block * 42;
+    const c = document.createElement('canvas');
+    c.width = c.height = size;
+    const g = c.getContext('2d');
+    for (let y = 0; y < size; y += block) {
+        for (let x = 0; x < size; x += block) {
+            const v = (Math.random() * 255) | 0;
+            g.fillStyle = 'rgb(' + v + ',' + v + ',' + v + ')';
+            g.fillRect(x, y, block, block);
+        }
+    }
+    GRAIN.block = block; GRAIN.tile = c; GRAIN.size = size;
+})(3);
+
+function paintGrain(ctx, w, h, alpha) {
+    if (alpha <= 0.003) return;
+    const b = GRAIN.block, size = GRAIN.size;
+    const ox = -Math.floor(Math.random() * (size / b)) * b;
+    const oy = -Math.floor(Math.random() * (size / b)) * b;
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.globalCompositeOperation = 'multiply';
+    ctx.imageSmoothingEnabled = false;
+    for (let gx = ox; gx < w; gx += size) {
+        for (let gy = oy; gy < h; gy += size) ctx.drawImage(GRAIN.tile, gx, gy);
+    }
+    ctx.restore();
+}
+
+
+/* ==============================================================
+   간섭 필드
+   핵심은 "낮은 해상도로 계산하고 확대"입니다.
+   선을 하나도 긋지 않으므로 도표처럼 보이지 않고,
+   확대하면서 브라우저 보간이 알아서 부드럽게 뭉개줍니다.
+   ============================================================== */
+(function () {
+    const canvas = document.getElementById('heroCanvas');
+    const host = canvas.parentElement;
+    const ctx = canvas.getContext('2d');
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // 저해상도 계산용 오프스크린
+    const low = document.createElement('canvas');
+    const lowCtx = low.getContext('2d');
+    let lw = 1, lh = 1, lowImg = null;
+
+    let W = 0, H = 0, dpr = 1, t = 0;
+    let density = 1, waveScale = 1, softness = 6, grainGain = 1;
+
+    /* sin 을 픽셀마다 부르면 부담이 되므로 룩업 테이블을 씁니다. */
+    const LUT_N = 2048;
+    const SIN = new Float32Array(LUT_N);
+    for (let i = 0; i < LUT_N; i++) SIN[i] = Math.sin((i / LUT_N) * Math.PI * 2);
+    const LUT_K = LUT_N / (Math.PI * 2);
+    function fsin(a) {
+        let i = (a * LUT_K) | 0;
+        i %= LUT_N; if (i < 0) i += LUT_N;
+        return SIN[i];
+    }
+
+    /* 세 개의 음원.
+       파장을 무리수에 가까운 비율로 어긋나게 두어야
+       무늬가 규칙적으로 반복되지 않고 계속 새로 태어납니다. */
+    const SRC = [
+        { hx: 0.24, hy: 0.30, wl: 172, sp: 0.0130, amp: 1.00, dx: 0.00031, dy: 0.00021, ph: 0 },
+        { hx: 0.72, hy: 0.58, wl: 231, sp: 0.0094, amp: 0.92, dx: -0.00024, dy: 0.00029, ph: 2.1 },
+        { hx: 0.52, hy: 0.86, wl: 297, sp: 0.0071, amp: 0.78, dx: 0.00018, dy: -0.00026, ph: 4.4 }
+    ];
+
+    // 커서는 첫 번째 음원을 아주 느리게 끌어당깁니다
+    let pointerX = null, pointerY = null;
+
+    function resize() {
+        dpr = Math.min(window.devicePixelRatio || 1, 2);
+        W = host.offsetWidth; H = host.offsetHeight;
+        canvas.width = Math.round(W * dpr);
+        canvas.height = Math.round(H * dpr);
+        canvas.style.width = W + 'px';
+        canvas.style.height = H + 'px';
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        rebuildLow();
+    }
+
+    function rebuildLow() {
+        // softness 가 클수록 더 낮은 해상도로 계산 → 더 부드럽게 뭉개집니다
+        lw = Math.max(48, Math.min(300, Math.round(W / softness)));
+        lh = Math.max(32, Math.round(lw * H / Math.max(1, W)));
+        low.width = lw; low.height = lh;
+        lowImg = lowCtx.createImageData(lw, lh);
+    }
+
+    window.addEventListener('resize', resize);
+
+    host.addEventListener('mousemove', function (e) {
+        const r = host.getBoundingClientRect();
+        pointerX = (e.clientX - r.left) / r.width;
+        pointerY = (e.clientY - r.top) / r.height;
+    });
+    host.addEventListener('mouseleave', function () { pointerX = pointerY = null; });
+    host.addEventListener('touchmove', function (e) {
+        const p = e.touches[0]; if (!p) return;
+        const r = host.getBoundingClientRect();
+        pointerX = (p.clientX - r.left) / r.width;
+        pointerY = (p.clientY - r.top) / r.height;
+    }, { passive: true });
+    host.addEventListener('touchend', function () { pointerX = pointerY = null; });
+
+    function computeField() {
+        const data = lowImg.data;
+        const stepX = W / lw, stepY = H / lh;
+
+        // 이번 프레임의 음원 위치를 화면 좌표로 미리 계산
+        const s = SRC.map(function (o) {
+            return {
+                x: o.hx * W,
+                y: o.hy * H,
+                k: (Math.PI * 2) / (o.wl * waveScale),
+                w: o.sp,
+                a: o.amp,
+                ph: o.ph
+            };
+        });
+        const invSum = 1 / (s[0].a + s[1].a + s[2].a);
+
+        let p = 0;
+        for (let yi = 0; yi < lh; yi++) {
+            const py = (yi + 0.5) * stepY;
+            // 위아래 가장자리는 서서히 사라지게 (화면에 갇힌 느낌을 없앰)
+            const ey = Math.min(1, Math.min(yi, lh - 1 - yi) / (lh * 0.30));
+            for (let xi = 0; xi < lw; xi++) {
+                const px = (xi + 0.5) * stepX;
+
+                let v = 0;
+                for (let i = 0; i < 3; i++) {
+                    const si = s[i];
+                    const dx = px - si.x, dy = py - si.y;
+                    const d = Math.sqrt(dx * dx + dy * dy);
+                    v += si.a * fsin(d * si.k - t * si.w + si.ph);
+                }
+                v *= invSum;                 // -1 ~ 1
+                v = v * 0.5 + 0.5;           // 0 ~ 1
+                v = v * v * (3 - 2 * v);     // smoothstep — 마루를 살짝 강조
+
+                // 좌우 가장자리 감쇠 + 왼쪽(글자 영역)은 조금 더 옅게
+                const fx = xi / (lw - 1);
+                const ex = Math.min(1, Math.min(xi, lw - 1 - xi) / (lw * 0.22));
+                const bias = 0.55 + 0.45 * fx;
+
+                const a = v * ey * ex * bias * density * 0.30;
+
+                data[p]     = 26;
+                data[p + 1] = 26;
+                data[p + 2] = 30;
+                data[p + 3] = (a * 255) | 0;
+                p += 4;
+            }
+        }
+        lowCtx.putImageData(lowImg, 0, 0);
+    }
+
+    let odd = false;
+    function frame() {
+        t += 1;
+
+        // 음원을 아주 느리게 흘려보냅니다
+        SRC.forEach(function (o, i) {
+            o.hx += o.dx; o.hy += o.dy;
+            if (o.hx < 0.08 || o.hx > 0.92) o.dx *= -1;
+            if (o.hy < 0.10 || o.hy > 0.90) o.dy *= -1;
+            if (i === 0 && pointerX !== null) {
+                o.hx += (pointerX - o.hx) * 0.010;
+                o.hy += (pointerY - o.hy) * 0.010;
+            }
+        });
+
+        // 필드는 두 프레임에 한 번만 다시 계산합니다 (움직임이 느려 티가 안 납니다)
+        odd = !odd;
+        if (!odd) computeField();
+
+        ctx.clearRect(0, 0, W, H);
+        ctx.imageSmoothingEnabled = true;
+        if ('imageSmoothingQuality' in ctx) ctx.imageSmoothingQuality = 'high';
+        ctx.drawImage(low, 0, 0, W, H);      // 확대하면서 자동으로 부드러워집니다
+
+        paintGrain(ctx, W, H, 0.030 * grainGain);
+
+        if (!reduceMotion) requestAnimationFrame(frame);
+    }
+
+    resize();
+    computeField();
+    frame();
+
+    /* ---------- 컨트롤 ---------- */
+    function bind(id, valId, fn, fmt) {
+        const el = document.getElementById(id);
+        el.addEventListener('input', function () {
+            const v = parseFloat(el.value);
+            fn(v);
+            document.getElementById(valId).textContent = fmt ? fmt(v) : v.toFixed(2);
+        });
+    }
+    bind('density', 'vDen',  function (v) { density = v; });
+    bind('wave',    'vWave', function (v) { waveScale = v; });
+    bind('soft',    'vSoft', function (v) { softness = v; rebuildLow(); computeField(); },
+         function (v) { return String(v | 0); });
+    bind('grain',   'vGrain', function (v) { grainGain = v; },
+         function (v) { return v.toFixed(1); });
+
+    document.getElementById('note').textContent =
+        'Softness 는 계산 해상도입니다. 값이 클수록 더 낮은 해상도로 계산해 더 흐릿해집니다.';
+})();
+</script>
+
+</body>
+</html>

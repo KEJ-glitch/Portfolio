@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>[프로토타입] Dynamic Hero - KIM EUNJUN</title>
+
+    <link rel="icon" href="images/favicon.png" type="image/x-icon">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+
+    <style>
+        /* ==========================================================
+           프로토타입 전용 스타일
+           실제 사이트(style.css)는 건드리지 않고 여기서만 덮어씁니다.
+           ========================================================== */
+
+        /* 히어로를 조금 더 크게 잡아 파형이 숨쉴 공간 확보 */
+        .hero { padding: 120px 0 200px; }
+
+        /* 텍스트 캔버스가 들어갈 자리.
+           API 미지원 시에는 이 안의 텍스트가 그냥 평범한 DOM으로 남습니다. */
+        #heroTextWrap {
+            position: relative;
+            z-index: 1;
+            display: inline-block;
+        }
+
+        /* API 지원 시 생성되는 텍스트용 캔버스 */
+        #textCanvas {
+            display: block;
+            /* 캔버스 자체는 레이아웃만 차지하고, 그림은 JS가 그립니다 */
+        }
+
+        /* 캔버스 안으로 옮겨진 텍스트는 브라우저가 자동으로 숨기지만,
+           혹시 모를 깜빡임을 막기 위해 트랜지션 제거 */
+        #heroText { transform-origin: 0 0; }
+
+        /* ---------- 프로토타입 컨트롤 패널 ---------- */
+        .proto-panel {
+            position: fixed;
+            right: 24px;
+            bottom: 24px;
+            z-index: 9999;
+            width: 290px;
+            padding: 18px 20px;
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--line-color);
+            border-radius: 10px;
+            font-size: 0.82rem;
+            line-height: 1.5;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+        }
+        .proto-panel h4 {
+            margin: 0 0 12px;
+            font-size: 0.75rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+        }
+        .proto-status {
+            padding: 9px 11px;
+            border-radius: 6px;
+            margin-bottom: 16px;
+            font-size: 0.78rem;
+        }
+        .proto-status.on  { background: #EAF6EE; color: #1B6B36; }
+        .proto-status.off { background: #F0F0F0; color: #666; }
+
+        .proto-row { margin-bottom: 14px; }
+        .proto-row:last-child { margin-bottom: 0; }
+        .proto-row label {
+            display: block;
+            margin-bottom: 6px;
+            color: var(--text-secondary);
+            font-size: 0.78rem;
+        }
+        .proto-row input[type="range"] { width: 100%; }
+        .proto-seg { display: flex; gap: 6px; }
+        .proto-seg button {
+            flex: 1;
+            padding: 7px 4px;
+            font: inherit;
+            font-size: 0.75rem;
+            background: #fff;
+            border: 1px solid var(--line-color);
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .proto-seg button:hover { border-color: #bbb; }
+        .proto-seg button.active {
+            background: var(--text-primary);
+            color: #fff;
+            border-color: var(--text-primary);
+        }
+        .proto-note {
+            margin-top: 14px;
+            padding-top: 12px;
+            border-top: 1px solid var(--line-color);
+            font-size: 0.72rem;
+            color: #999;
+        }
+
+        @media (max-width: 900px) {
+            .proto-panel { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="container header-flex">
+            <a href="index.html" class="logo">김은준 KIM EUNJUN.</a>
+            <nav>
+                <a href="index.html">← 실제 사이트로</a>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero">
+        <!-- 배경 파형 (모든 브라우저에서 동작 / 스크롤·마우스 반응형으로 강화) -->
+        <canvas id="heroWave" class="hero-canvas" aria-hidden="true"></canvas>
+
+        <div class="container">
+            <!--
+              heroText 는 기본적으로 평범한 DOM 입니다.
+              HTML-in-Canvas API 를 지원하는 브라우저에서만
+              JS가 이걸 <canvas layoutsubtree> 안으로 옮겨서 왜곡 렌더링합니다.
+            -->
+            <div id="heroTextWrap">
+                <div id="heroText">
+                    <p class="subtitle">Composer &amp; Sound Artist</p>
+                    <h1>SOUND<br>TECHNOLOGY<br>ART.</h1>
+                    <div class="divider"></div>
+                    <p class="description">소리로 기술과 예술의<br>새로운 감각을 탐구합니다.</p>
+                    <p class="description">Exploring new sensibilities <br>in technology and art through sound.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            <h2 class="section-title">TEST</h2>
+            <p class="description" style="max-width:640px">
+                위 히어로 텍스트를 드래그해서 선택해보세요. 왜곡된 상태에서도 그대로 복사됩니다.
+                Cmd/Ctrl+F 로 "TECHNOLOGY" 를 검색해도 잡힙니다. 이게 이 API의 핵심입니다.
+            </p>
+            <p class="description" style="max-width:640px">
+                스크롤을 빠르게 움직이거나 히어로 위에서 마우스를 움직여보세요. 파형이 반응합니다.
+            </p>
+        </div>
+    </section>
+
+    <!-- ================= 프로토타입 컨트롤 패널 ================= -->
+    <div class="proto-panel">
+        <h4>Prototype Controls</h4>
+
+        <div id="protoStatus" class="proto-status off">확인 중…</div>
+
+        <div class="proto-row">
+            <label>텍스트 왜곡 모드</label>
+            <div class="proto-seg" id="modeSeg">
+                <button data-mode="off">Off</button>
+                <button data-mode="drift">Drift</button>
+                <button data-mode="ripple" class="active">Ripple</button>
+            </div>
+        </div>
+
+        <div class="proto-row">
+            <label>왜곡 강도 <span id="intensityVal">1.0</span></label>
+            <input type="range" id="intensity" min="0" max="2.5" step="0.1" value="1">
+        </div>
+
+        <div class="proto-row">
+            <label>배경 파형 강도 <span id="bgVal">1.0</span></label>
+            <input type="range" id="bgIntensity" min="0" max="2.5" step="0.1" value="1">
+        </div>
+
+        <div class="proto-note" id="protoNote"></div>
+    </div>
+
+    <script>
+    /* ============================================================
+       1. 배경 파형 — 모든 브라우저에서 동작하는 기본 레이어
+          기존 wave-bg.js 를 스크롤 속도 + 마우스 반응형으로 확장
+       ============================================================ */
+    (function () {
+        const canvas = document.getElementById('heroWave');
+        if (!canvas) return;
+
+        const host = canvas.parentElement;
+        const ctx = canvas.getContext('2d');
+        const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        let w, h, dpr;
+        let mouseX = 0.5, targetMouseX = 0.5;
+        let mouseY = 0.5, targetMouseY = 0.5;
+        let energy = 0, targetEnergy = 0;   // 스크롤 속도로 만드는 "에너지"
+        let t = 0;
+        let lastScroll = window.scrollY;
+
+        window.PROTO_BG_INTENSITY = 1;
+
+        function resize() {
+            dpr = Math.min(window.devicePixelRatio || 1, 2);
+            w = host.offsetWidth;
+            h = host.offsetHeight;
+            canvas.width = w * dpr;
+            canvas.height = h * dpr;
+            canvas.style.width = w + 'px';
+            canvas.style.height = h + 'px';
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        host.addEventListener('mousemove', function (e) {
+            const r = host.getBoundingClientRect();
+            targetMouseX = (e.clientX - r.left) / r.width;
+            targetMouseY = (e.clientY - r.top) / r.height;
+        });
+        host.addEventListener('mouseleave', function () {
+            targetMouseX = 0.5;
+            targetMouseY = 0.5;
+        });
+
+        // 스크롤 속도 → 파형 에너지
+        window.addEventListener('scroll', function () {
+            const delta = Math.abs(window.scrollY - lastScroll);
+            lastScroll = window.scrollY;
+            targetEnergy = Math.min(1, targetEnergy + delta * 0.012);
+        }, { passive: true });
+
+        // 배경 파형: 여러 개의 배음(harmonic)을 겹쳐 더 유기적으로
+        const lines = [
+            { amp: 16, freq: 1.4, speed: 0.015, phase: 0, alpha: 0.09, harm: 2.7 },
+            { amp: 24, freq: 0.9, speed: 0.010, phase: 2, alpha: 0.06, harm: 3.3 },
+            { amp: 32, freq: 0.6, speed: 0.007, phase: 4, alpha: 0.045, harm: 1.9 },
+            { amp: 40, freq: 0.4, speed: 0.005, phase: 5.5, alpha: 0.03, harm: 2.2 }
+        ];
+
+        function frame() {
+            t += 1;
+            mouseX += (targetMouseX - mouseX) * 0.04;
+            mouseY += (targetMouseY - mouseY) * 0.04;
+            energy += (targetEnergy - energy) * 0.06;
+            targetEnergy *= 0.94;                       // 에너지는 서서히 감쇠
+
+            // 다른 스크립트에서 참조할 수 있게 노출 (텍스트 왜곡과 동기화)
+            window.PROTO_WAVE = { t: t, energy: energy, mouseX: mouseX, mouseY: mouseY };
+
+            const gain = window.PROTO_BG_INTENSITY;
+            ctx.clearRect(0, 0, w, h);
+
+            lines.forEach(function (ln, i) {
+                const dir = (i % 2 === 0) ? 1 : -1;
+                const mouseBoost = 1 + (mouseX - 0.5) * 1.2 * dir;
+                const amp = ln.amp * Math.max(0.3, mouseBoost) * (1 + energy * 1.6) * gain;
+                const yc = h * (0.32 + i * 0.14) + (mouseY - 0.5) * 18 * dir;
+
+                ctx.beginPath();
+                for (let x = 0; x <= w; x += 4) {
+                    // 기본파 + 배음을 더해 단조로운 사인파를 피함
+                    const base = Math.sin(x * ln.freq * 0.01 + t * ln.speed + ln.phase);
+                    const over = Math.sin(x * ln.freq * 0.01 * ln.harm + t * ln.speed * 1.7 + ln.phase) * 0.35;
+                    const y = yc + (base + over) * amp;
+                    if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+                }
+                ctx.strokeStyle = 'rgba(26,26,26,' + (ln.alpha * (1 + energy * 0.8)) + ')';
+                ctx.lineWidth = 1.2;
+                ctx.stroke();
+            });
+
+            if (!reduceMotion) requestAnimationFrame(frame);
+        }
+        frame();
+    })();
+
+
+    /* ============================================================
+       2. HTML-in-Canvas — 텍스트 자체를 파형으로 왜곡하는 실험 레이어
+          지원하지 않는 브라우저에서는 아무 일도 일어나지 않고
+          텍스트는 평범한 DOM 그대로 남습니다. (점진적 향상)
+       ============================================================ */
+    (function () {
+        const statusEl = document.getElementById('protoStatus');
+        const noteEl = document.getElementById('protoNote');
+
+        // --- 기능 감지 ---
+        const probe = document.createElement('canvas').getContext('2d');
+        const SUPPORTED = typeof probe.drawElementImage === 'function';
+
+        if (!SUPPORTED) {
+            statusEl.className = 'proto-status off';
+            statusEl.textContent = 'HTML-in-Canvas 미지원 — 텍스트는 일반 DOM으로 표시됩니다.';
+            noteEl.innerHTML =
+                'Chrome Canary 149+ 에서 <code>chrome://flags/#canvas-draw-element</code> ' +
+                '플래그를 켜면 텍스트 왜곡이 활성화됩니다. ' +
+                '지금은 배경 파형만 동작합니다.';
+            // 배경 파형 슬라이더는 여전히 동작하도록 아래 컨트롤 바인딩은 계속 진행
+            bindControls(null);
+            return;
+        }
+
+        // --- 지원되는 경우: 텍스트를 캔버스 안으로 이동 ---
+        const wrap = document.getElementById('heroTextWrap');
+        const textEl = document.getElementById('heroText');
+
+        const rect = textEl.getBoundingClientRect();
+        const PAD = 70;                                   // 좌우 왜곡이 잘리지 않도록 여백
+        const cssW = Math.ceil(rect.width) + PAD * 2;
+        const cssH = Math.ceil(rect.height);
+
+        const canvas = document.createElement('canvas');
+        canvas.id = 'textCanvas';
+        canvas.setAttribute('layoutsubtree', '');
+        canvas.style.width = cssW + 'px';
+        canvas.style.height = cssH + 'px';
+        canvas.style.marginLeft = (-PAD) + 'px';          // 여백만큼 되돌려 원래 위치 유지
+
+        wrap.appendChild(canvas);
+        canvas.appendChild(textEl);                       // 텍스트를 캔버스의 자식으로 이동
+
+        const ctx = canvas.getContext('2d');
+        let dpr = 1;
+
+        function sizeCanvas() {
+            dpr = Math.min(window.devicePixelRatio || 1, 2);
+            canvas.width = Math.round(cssW * dpr);
+            canvas.height = Math.round(cssH * dpr);
+        }
+        sizeCanvas();
+        window.addEventListener('resize', sizeCanvas);
+
+        // --- 상태 ---
+        let mode = 'ripple';
+        let intensity = 1;
+
+        // --- 그리기 ---
+        function paint() {
+            const wave = window.PROTO_WAVE || { t: 0, energy: 0, mouseX: 0.5, mouseY: 0.5 };
+            const t = wave.t;
+            const energy = wave.energy;
+
+            ctx.reset();
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+            let hitTransform = null;
+
+            if (mode === 'off' || intensity === 0) {
+                // 왜곡 없이 그대로 한 번만 그리기
+                ctx.translate(PAD, 0);
+                hitTransform = ctx.drawElementImage(textEl, 0, 0);
+
+            } else if (mode === 'drift') {
+                // 전체가 통째로 부드럽게 흔들림 — 히트테스트가 정확히 일치
+                const dx = Math.sin(t * 0.012) * 7 * intensity * (1 + energy);
+                const dy = Math.cos(t * 0.009) * 4 * intensity * (1 + energy);
+                ctx.translate(PAD + dx, dy);
+                hitTransform = ctx.drawElementImage(textEl, 0, 0);
+
+            } else {
+                // ripple — 가로 슬라이스별로 사인파 변위를 줘서 물결처럼 일렁이게
+                const SLICES = 30;
+                const sliceH = cssH / SLICES;
+                const amp = 9 * intensity * (1 + energy * 1.8);
+                const mid = Math.floor(SLICES / 2);
+
+                for (let i = 0; i < SLICES; i++) {
+                    ctx.save();
+
+                    // 이 슬라이스만 보이도록 클리핑 (+1 은 이음새 방지)
+                    ctx.beginPath();
+                    ctx.rect(0, i * sliceH, cssW, sliceH + 1);
+                    ctx.clip();
+
+                    const dx = Math.sin(t * 0.018 + i * 0.38) * amp
+                             + Math.sin(t * 0.007 + i * 0.13) * amp * 0.45;
+
+                    ctx.translate(PAD + dx, 0);
+                    const tr = ctx.drawElementImage(textEl, 0, 0);
+
+                    // 가운데 슬라이스의 변환을 히트테스트 기준으로 사용
+                    if (i === mid) hitTransform = tr;
+
+                    ctx.restore();
+                }
+            }
+
+            // 브라우저에 "이 요소가 화면상 어디에 있는지" 알려줘야
+            // 텍스트 선택 / 클릭 / 찾기가 정확히 동작합니다.
+            if (hitTransform) {
+                textEl.style.transform = hitTransform.toString();
+            }
+        }
+
+        canvas.onpaint = paint;
+
+        // 연속 애니메이션 루프
+        const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        function loop() {
+            if (typeof canvas.requestPaint === 'function') {
+                canvas.requestPaint();
+            } else {
+                paint();
+            }
+            if (!reduceMotion) requestAnimationFrame(loop);
+        }
+        loop();
+
+        statusEl.className = 'proto-status on';
+        statusEl.textContent = 'HTML-in-Canvas 활성화됨 — 텍스트가 캔버스 안에서 렌더링 중입니다.';
+        noteEl.innerHTML =
+            '왜곡된 상태에서도 텍스트 선택 · 복사 · 페이지 내 검색(Cmd/Ctrl+F)이 그대로 동작합니다. ' +
+            'Ripple 모드는 슬라이스마다 다시 그리므로 Drift 보다 무겁습니다.';
+
+        bindControls({
+            setMode: function (m) { mode = m; },
+            setIntensity: function (v) { intensity = v; }
+        });
+    })();
+
+
+    /* ============================================================
+       3. 컨트롤 패널 바인딩
+          api 가 null 이면 (미지원) 배경 파형 슬라이더만 동작합니다.
+       ============================================================ */
+    function bindControls(api) {
+        const seg = document.getElementById('modeSeg');
+        const intensityInput = document.getElementById('intensity');
+        const intensityVal = document.getElementById('intensityVal');
+        const bgInput = document.getElementById('bgIntensity');
+        const bgVal = document.getElementById('bgVal');
+
+        // 배경 파형 강도는 항상 동작
+        bgInput.addEventListener('input', function () {
+            window.PROTO_BG_INTENSITY = parseFloat(bgInput.value);
+            bgVal.textContent = parseFloat(bgInput.value).toFixed(1);
+        });
+
+        if (!api) {
+            // 미지원 환경에서는 텍스트 관련 컨트롤 비활성화
+            seg.querySelectorAll('button').forEach(function (b) {
+                b.disabled = true;
+                b.style.opacity = 0.4;
+                b.style.cursor = 'not-allowed';
+            });
+            intensityInput.disabled = true;
+            intensityInput.style.opacity = 0.4;
+            return;
+        }
+
+        seg.addEventListener('click', function (e) {
+            const btn = e.target.closest('button');
+            if (!btn) return;
+            seg.querySelectorAll('button').forEach(function (b) { b.classList.remove('active'); });
+            btn.classList.add('active');
+            api.setMode(btn.dataset.mode);
+        });
+
+        intensityInput.addEventListener('input', function () {
+            const v = parseFloat(intensityInput.value);
+            api.setIntensity(v);
+            intensityVal.textContent = v.toFixed(1);
+        });
+    }
+    </script>
+
+</body>
+</html>

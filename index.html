@@ -2,26 +2,226 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>KIM EUNJUN | Composer & Sound Artist</title>
-    
-    <link rel="icon" href="images/favicon.png" type="image/x-icon">
-    
-    <link rel="stylesheet" href="style.css">
-    </head>
-    <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-4T91PWLKF4"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-4T91PWLKF4');
-</script>
-    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KIM EUNJUN | Composer & Sound Artist</title>
+    <title>KIM EUNJUN | Composer &amp; Sound Artist</title>
+
+    <link rel="icon" href="images/favicon.png" type="image/x-icon">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://www.kimeunjun.com/">
+    <meta property="og:title" content="김은준 KIM EUNJUN | Composer &amp; Sound Artist">
+    <meta property="og:description" content="Exploring new sensibilities in technology and art through sound — and how a space comes to be filled by it.">
+    <meta property="og:image" content="https://www.kimeunjun.com/images/og-image.jpg">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="김은준 KIM EUNJUN | Composer &amp; Sound Artist">
+    <meta name="twitter:description" content="Exploring new sensibilities in technology and art through sound — and how a space comes to be filled by it.">
+    <meta name="twitter:image" content="https://www.kimeunjun.com/images/og-image.jpg">
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-4T91PWLKF4"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-4T91PWLKF4');
+    </script>
+
+    <style>
+        html, body { overflow-x: hidden; }
+
+        /* 히어로 설명은 style.css 의 .description 을 그대로 씁니다 */
+
+        /* ==========================================================
+           공간 지도 (Spatial Map)
+           ========================================================== */
+        .map-wrap {
+            position: relative;
+            /* 컨테이너를 벗어나 화면 양끝까지 — 테두리 없이 페이지에 그대로 얹힙니다 */
+            width: 100vw; margin-left: calc(50% - 50vw);
+            height: clamp(420px, 68vh, 680px);
+            background: transparent;
+            overflow: hidden;
+            cursor: grab;
+            touch-action: pan-y;   /* 세로 스크롤은 살리고 가로 드래그만 가져감 */
+        }
+        .map-wrap.dragging { cursor: grabbing; }
+        .map-wrap canvas { display: block; width: 100%; height: 100%; }
+
+        .map-hud {
+            position: absolute; left: 50%; bottom: 16px;
+            transform: translateX(-50%); z-index: 4;
+            display: flex; align-items: center; gap: 18px; white-space: nowrap;
+        }
+        .map-hint {
+            font-size: 0.7rem; color: #BBB; letter-spacing: 0.04em;
+            pointer-events: none; transition: opacity 0.4s;
+        }
+        .map-reset {
+            font: inherit; font-size: 0.7rem; letter-spacing: 0.05em;
+            padding: 7px 15px; color: var(--text-secondary);
+            background: rgba(255,255,255,0.72);
+            border: 1px solid var(--line-color); border-radius: 4px;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .map-reset:hover { color: var(--text-primary); border-color: #BBB; }
+        .map-wrap.touched .map-hint { opacity: 0; }
+
+        /* 점 위에 뜨는 정보 카드 */
+        .map-tip {
+            position: absolute; z-index: 5; pointer-events: none;
+            background: rgba(20,20,22,0.94); color: #fff;
+            padding: 11px 14px; border-radius: 5px;
+            font-size: 0.78rem; line-height: 1.65;
+            max-width: 260px; transform: translate(-50%, -125%);
+            box-shadow: 0 6px 22px rgba(0,0,0,0.18);
+        }
+        .map-tip strong { display: block; font-size: 0.92rem; margin-bottom: 3px; }
+        .map-tip span { color: rgba(255,255,255,0.6); }
+        .map-tip[hidden] { display: none; }
+
+        .map-legend {
+            display: flex; flex-wrap: wrap; gap: 22px;
+            margin-top: 16px; font-size: 0.76rem; color: var(--text-secondary);
+        }
+        .map-legend i {
+            display: inline-block; width: 10px; height: 10px;
+            border-radius: 50%; background: var(--text-primary);
+            margin-right: 7px; vertical-align: middle;
+        }
+        .map-legend i.hollow { background: #FFF; border: 2px solid var(--text-primary); }
+
+        /* ==========================================================
+           작품 목록 — 공간 스펙 포함
+           ========================================================== */
+        .wtoolbar { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 34px; }
+        .wtoolbar button {
+            font: inherit; font-size: 0.78rem; padding: 8px 15px;
+            background: #fff; border: 1px solid var(--line-color);
+            border-radius: 5px; cursor: pointer; transition: all 0.2s;
+        }
+        .wtoolbar button:hover { border-color: #bbb; }
+        .wtoolbar button.active {
+            background: var(--text-primary); color: #fff; border-color: var(--text-primary);
+        }
+
+        /* ---------- 풀블리드 배너형 작품 행 ---------- */
+        .wrow {
+            position: relative; display: block;
+            /* 컨테이너를 벗어나 화면 양끝까지 */
+            width: 100vw; margin-left: calc(50% - 50vw);
+            min-height: 470px; overflow: hidden;
+            background: #111; color: #fff; text-decoration: none;
+        }
+        .wrow:hover { opacity: 1; }   /* 전역 a:hover 페이드 해제 */
+
+        .wbg {
+            position: absolute; inset: 0;
+            width: 100%; height: 100%; object-fit: cover;
+            transition: transform 0.9s cubic-bezier(0.22,1,0.36,1), filter 0.55s ease;
+        }
+        /* 텍스트가 놓이는 왼쪽이 어둡고 오른쪽으로 갈수록 이미지가 드러납니다 */
+        .wscrim {
+            position: absolute; inset: 0;
+            background: linear-gradient(90deg,
+                rgba(12,12,14,0.90) 0%,
+                rgba(12,12,14,0.78) 38%,
+                rgba(12,12,14,0.42) 68%,
+                rgba(12,12,14,0.18) 100%);
+            transition: background 0.55s ease;
+        }
+        .wrow:hover .wbg { transform: scale(1.06); filter: blur(5px) saturate(0.92); }
+        .wrow:hover .wscrim {
+            background: linear-gradient(90deg,
+                rgba(12,12,14,0.94) 0%,
+                rgba(12,12,14,0.87) 45%,
+                rgba(12,12,14,0.66) 75%,
+                rgba(12,12,14,0.48) 100%);
+        }
+
+        .winner {
+            position: relative; z-index: 2;
+            max-width: 1250px; margin: 0 auto; padding: 62px 40px;
+            min-height: 470px;
+            display: flex; flex-direction: column; justify-content: center;
+        }
+        .wtext { max-width: 620px; }
+        .wrow h3 {
+            margin: 0 0 8px; font-size: 2.3rem; font-weight: 800;
+            letter-spacing: -0.02em; color: #fff;
+        }
+        .wrow .wsub { color: rgba(255,255,255,0.74); font-size: 1rem; margin-bottom: 6px; }
+        .wrow .wmeta { font-size: 0.85rem; color: rgba(255,255,255,0.45); font-family: monospace; }
+
+        /* 기술 스펙 블록 + 스피커 배치도 */
+        .spec { font-size: 0.84rem; line-height: 1.8; margin-top: 28px; max-width: 620px; }
+        .spec dl { margin: 0; display: grid; grid-template-columns: 78px 1fr; gap: 3px 14px; }
+        .spec dt {
+            color: rgba(255,255,255,0.40); font-size: 0.7rem;
+            text-transform: uppercase; letter-spacing: 0.08em; padding-top: 3px;
+        }
+        .spec dd { margin: 0; color: rgba(255,255,255,0.87); }
+        .spec .todo {
+            color: #F0C36B; background: rgba(240,195,107,0.15);
+            padding: 0 6px; border-radius: 2px;
+        }
+
+        /* 스피커 배치도 — 정사각형이 공간, 위쪽이 무대, 점이 스피커 */
+        /* 배치도는 배너 정중앙에 고정 — 텍스트 흐름에서 빼냅니다 */
+        .sdiag-wrap {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 3; text-align: center; pointer-events: none;
+        }
+        .sdiag-cap {
+            color: rgba(255,255,255,0.40); font-size: 0.7rem;
+            text-transform: uppercase; letter-spacing: 0.1em;
+            margin-bottom: 12px; text-align: center;
+        }
+        /* 밝은 사진 위에서도 흰 점이 읽히도록 어두운 후광 */
+        .sdiag {
+            width: 150px; height: 150px; display: block; margin: 0 auto;
+            filter: drop-shadow(0 0 7px rgba(0,0,0,0.6));
+        }
+        .sdiag .room { fill: none; stroke: rgba(255,255,255,0.20); stroke-width: 1; }
+        .sdiag .spk  { fill: rgba(255,255,255,0.92); }
+        .sdiag .dlbl {
+            fill: rgba(255,255,255,0.34); font-size: 7px; text-anchor: middle;
+            letter-spacing: 1.4px; font-family: monospace;
+        }
+        .sdiag .hp { fill: none; stroke: rgba(255,255,255,0.85); stroke-width: 2.6; }
+        .sdiag .hp-cup { fill: rgba(255,255,255,0.85); }
+
+        @media (max-width: 900px) {
+            .wrow { min-height: 400px; }
+            .winner { min-height: 400px; padding: 46px 25px; }
+            .wrow h3 { font-size: 1.75rem; }
+            .wtext, .spec { max-width: 100%; }
+            /* 좁은 화면에서는 배치도를 스펙 아래로 내립니다 */
+            /* 좁은 화면에서는 절대 배치를 풀고 스펙 아래로 내립니다 */
+            .sdiag-wrap {
+                position: static; transform: none;
+                margin-top: 26px; text-align: left;
+            }
+            .sdiag-cap { text-align: left; }
+            .sdiag { width: 132px; height: 132px; margin: 0; }
+            /* 좁은 화면에서는 가로 그라데이션이 안 통하므로 세로로 */
+            .wscrim, .wrow:hover .wscrim {
+                background: linear-gradient(180deg,
+                    rgba(12,12,14,0.55) 0%,
+                    rgba(12,12,14,0.86) 55%,
+                    rgba(12,12,14,0.92) 100%);
+            }
+            /* 높이는 위의 clamp() 가 처리합니다 (이전 aspect-ratio 규칙 제거)
+               좁은 화면에서는 안내문이 넘치므로 Reset 버튼만 남깁니다 */
+            .map-hint { display: none; }
+            .map-hud { gap: 0; }
+            .map-reset { padding: 9px 18px; font-size: 0.72rem; }
+            .node .lbl { font-size: 0.62rem; }
+        }
+    </style>
 </head>
 <body>
 
@@ -29,6 +229,7 @@
         <div class="container header-flex">
             <div class="logo">김은준 KIM EUNJUN.</div>
             <nav>
+                <a href="#map">Space</a>
                 <a href="#works">Works</a>
                 <a href="#about">About</a>
                 <a href="#contact">Contact</a>
@@ -36,263 +237,152 @@
         </div>
     </header>
 
+    <!-- ===================== HERO ===================== -->
     <section class="hero">
         <canvas id="heroWave" class="hero-canvas" aria-hidden="true"></canvas>
         <div class="container">
-            <p class="subtitle">Composer & Sound Artist</p>
+            <p class="subtitle">Composer &amp; Sound Artist</p>
             <h1>SOUND<br>TECHNOLOGY<br>ART.</h1>
             <div class="divider"></div>
-            <p class="description">소리로 기술과 예술의<br>새로운 감각을 탐구합니다.</p>
-            <p class="description">Exploring new sensibilities <br>in technology and art through sound.</p>
+            <p class="description">
+                Exploring new sensibilities <br>in technology and art through sound —
+                <br>and how a space comes to be filled by it.
+            </p>
         </div>
     </section>
 
-    <section id="works" class="section">
+    <!-- ===================== SPATIAL MAP ===================== -->
+    <section id="map" class="section">
         <div class="container">
-            <h2 class="section-title">WORKS</h2>
-            
-            <div class="work-list">
-                <a href="details/project11_sequential.html" class="work-link">
-                    <div class="work-item">
-                        <div class="work-text">
-                            <h3>Sequential</h3>
-                            <h5>for Quartet and Live Electronics</h5>
-                            <p>[Electro-acoustic]</p>
-                            <span class="year">2026</span>
-                        </div>
-                        <div class="iframe-wrap hover-effect contain-thumb">
-                            <img src="images/work11.jpeg" alt="" class="work-thumb-bg" aria-hidden="true">
-                            <img src="images/work11.jpeg" alt="Sequential" class="work-thumb">
-                        </div>
-                    </div>
-                </a>
+            <h2 class="section-title">SPATIAL PRACTICE</h2>
+            <p class="description" style="max-width:700px; margin-bottom:44px">
+                Every work plotted against three measured axes — channel count, how far the piece
+                is driven by live input rather than fixed media, and the year it was made.
+                The line traces them in chronological order.
+            </p>
 
-                <a href="details/project10_lucid.html" class="work-link">
-                    <div class="work-item">
-                        <div class="work-text">
-                            <h3>Lucid</h3>
-                            <h5>for Piano and Live Electronics</h5>
-                            <p>[Electro-acoustic]</p>
-                            <span class="year">2025</span>
-                        </div>
-                        <div class="iframe-wrap hover-effect">
-                            <img src="images/work10.jpg" alt="Lucid" class="work-thumb">
-                        </div>
-                    </div>
-                </a>
+            <div class="map-wrap" id="mapWrap">
+                <canvas id="mapCanvas"></canvas>
+                <div class="map-tip" id="mapTip" hidden></div>
+                <div class="map-hud">
+                    <span class="map-hint">Drag to rotate · click a point to open the work</span>
+                    <button class="map-reset" id="mapReset" type="button">Reset view</button>
+                </div>
+            </div>
 
-                <a href="details/project09_axiom2.html" class="work-link">
-                    <div class="work-item">
-                        <div class="work-text">
-                            <h3>Axiom 2</h3>
-                            <h5>for Audio-visual</h5>
-                            <p>[Fixed Media]</p>
-                            <span class="year">2024</span>
-                        </div>
-                        <div class="iframe-wrap hover-effect">
-                            <img src="images/work09.png" alt="axiom2" class="work-thumb">
-                        </div>
-                    </div>
-                </a>
-
-                <a href="details/project08_diamondDust.html" class="work-link">
-                    <div class="work-item">
-                        <div class="work-text">
-                            <h3>Diamond Dust</h3>
-                            <h5>for XR with AI Character</h5>
-                            <p>[Collaborative Work]</p>
-                            <span class="year">2024</span>
-                        </div>
-                        <div class="iframe-wrap hover-effect">
-                            <img src="images/work08.png" alt="diamondDust" class="work-thumb">
-                        </div>
-                    </div>
-                </a>
-
-                <a href="details/project07_islandAir.html" class="work-link">
-                    <div class="work-item">
-                        <div class="work-text">
-                            <h3>island air</h3>
-                            <h5>for Realtime Audio-visual</h5>
-                            <p>[Live Electronics]</p>
-                            <span class="year">2023</span>
-                        </div>
-                        <div class="iframe-wrap hover-effect">
-                            <img src="images/work07.png" alt="islandAir" class="work-thumb">
-                        </div>
-                    </div>
-                </a>
-
-                <a href="details/project06_datenprotokoll.html" class="work-link">
-                    <div class="work-item">
-                        <div class="work-text">
-                            <h3>DATENPROTOKOLL</h3>
-                            <h5>for Performers and Live Electronics</h5>
-                            <p>[Collaborative Work]</p>
-                            <span class="year">2022</span>
-                        </div>
-                        <div class="iframe-wrap hover-effect">
-                            <img src="images/work06.png" alt="DATENPROTOKOLL" class="work-thumb">
-                        </div>
-                    </div>
-                </a>
-
-                <a href="details/project05_interrupt.html" class="work-link">
-                    <div class="work-item">
-                        <div class="work-text">
-                            <h3>interrupt</h3>
-                            <h5>for Violin and Live Electronics</h5>
-                            <p>[Electro-acoustic]</p>
-                            <span class="year">2022</span>
-                        </div>
-                        <div class="iframe-wrap hover-effect">
-                            <img src="images/work05_0.JPG" alt="interrupt" class="work-thumb">
-                        </div>
-                    </div>
-                </a>
-
-                <a href="details/project04_axiom.html" class="work-link">
-                    <div class="work-item">
-                        <div class="work-text">
-                            <h3>Axiom</h3>
-                            <h5>for Audio-visual Live</h5>
-                            <p>[Live Electronics]</p>
-                            <span class="year">2021</span>
-                        </div>
-                        <div class="iframe-wrap hover-effect">
-                            <img src="images/work04.png" alt="axiom" class="work-thumb">
-                        </div>
-                    </div>
-                </a>
-
-                <a href="details/project03_line.html" class="work-link">
-                    <div class="work-item">
-                        <div class="work-text">
-                            <h3>선 線, line</h3>
-                            <h5>for Live Electronics</h5>
-                            <p>[Live Electronics]</p>
-                            <span class="year">2021</span>
-                        </div>
-                        <div class="iframe-wrap hover-effect">
-                            <img src="images/work03.jpeg" alt="line" class="work-thumb">
-                        </div>
-                    </div>
-                </a>
-
-                <a href="details/project02_doppelganger.html" class="work-link">
-                    <div class="work-item">
-                        <div class="work-text">
-                            <h3>Doppelgänger</h3>
-                            <h5>for Audience-participatory<br>VR performance </h5>
-                            <p>[Collaborative Work]</p>
-                            <span class="year">2021</span>
-                        </div>
-                        <div class="iframe-wrap hover-effect">
-                            <img src="images/work02.jpg" alt="doppelganger" class="work-thumb">
-                        </div>
-                    </div>
-                </a>
-
-                <a href="details/project01_regulation.html" class="work-link">
-                    <div class="work-item">
-                        <div class="work-text">
-                            <h3>REGULATION</h3>
-                            <h5>for Audio-visual</h5>
-                            <p>[Fixed Media]</p>
-                            <span class="year">2020</span>
-                        </div>
-                        <div class="iframe-wrap hover-effect">
-                            <img src="images/work01.png" alt="regulation" class="work-thumb">
-                        </div>
-                    </div>
-                </a>
+            <div class="map-legend">
+                <span><i></i>Loudspeaker array</span>
+                <span><i class="hollow"></i>Headphone / HMD involved</span>
+                <span>Sphere size = channel count</span>
             </div>
         </div>
     </section>
 
+    <!-- ===================== WORKS ===================== -->
+    <section id="works" class="section">
+        <div class="container">
+            <h2 class="section-title">WORKS</h2>
+
+            <div class="wtoolbar" id="wtoolbar">
+                <button data-sort="channels" class="active">By channel count</button>
+                <button data-sort="live">By live input</button>
+                <button data-sort="year">By year</button>
+            </div>
+
+            <div id="workList"></div>
+        </div>
+    </section>
+
+    <!-- ===================== ABOUT ===================== -->
     <section id="about" class="section">
         <div class="container">
             <h2 class="section-title">ABOUT</h2>
-            
+
             <div class="about-layout">
-                
                 <div class="bio-container">
                     <div class="bio-text">
                         <h3 class="lang-title">English</h3>
                         <p>
-                            EunJun Kim is a composer whose work explores the intersection of music, media, and technology, with a primary focus on computer music. His practice spans electronic music performance, sound installation, audiovisual art, and performance music within VR and metaverse environments, emphasizing hybrid forms that integrate artistic and technological approaches.
+                            EunJun Kim is a composer working at the intersection of music, media, and technology,
+                            with a primary focus on how sound occupies and moves through space. His practice spans
+                            multichannel electroacoustic composition, sound installation, audiovisual work, and
+                            performance music within VR and XR environments — moving between speaker-array diffusion
+                            in physical rooms and virtual acoustic rendering over headphones and head-mounted displays.
                         </p>
                         <p>
-                            Kim is particularly interested in incorporating artificial intelligence, sensor data, and human movement into musical and visual expression. His research investigates how sound, space, and performance can interact dynamically, often by designing systems that generate or manipulate audio and visual elements in real time based on physical or environmental input.
+                            His work incorporates sensor data, human movement, and artificial intelligence into
+                            real-time systems that generate or transform sound and image. Recent pieces have treated
+                            reverberation itself as structural material (<em>Lucid</em>), used ambisonic panning as a
+                            compositional layer (<em>interrupt</em>), and distributed a quartet across an
+                            eight-speaker array (<em>Sequential</em>). Earlier works drew their generative logic from
+                            L-systems (<em>Axiom</em>), body-joint tracking (<em>DATENPROTOKOLL</em>), and
+                            environmental data (<em>island air</em>).
                         </p>
                         <p>
                             His creative inquiries revolve around questions such as:<br>
+                            · How does the perception of moving sound differ between virtual rendering and physical space?<br>
                             · How can technology expand the structural possibilities of musical composition?<br>
-                            · In what ways can music extend or transform sensory perception?<br>
-                            · How can artificial intelligence function as a creative collaborator in the artistic process?
-                        </p>
-                        <p>
-                            He is also deeply engaged in exploring spatial sound design, nonlinear performance structures, real-time interactive systems, and multichannel audio environments, seeking ways to construct musical narratives within technologically mediated frameworks. Currently, his research focuses on applying AI to music composition and performance, aiming to understand how human creators and algorithmic systems can collaborate in shaping new sonic and performative experiences.
+                            · How can artificial intelligence function as a creative collaborator?
                         </p>
                     </div>
 
                     <div class="bio-text korean-ver">
                         <h3 class="lang-title">Korean</h3>
                         <p>
-                            김은준은 음악, 미디어, 기술의 경계를 넘나들며 컴퓨터 음악을 중심으로 창작과 연구를 이어가는 작곡가입니다. 그의 작업은 전자음악 공연, 사운드 설치, 오디오비주얼 아트, 그리고 VR/메타버스 기반의 퍼포먼스 음악 등 다양한 매체와 기술을 융합한 형태로 확장되어 왔습니다.
+                            김은준은 소리가 공간을 어떻게 점유하고 이동하는지를 중심에 두고 작업하는 작곡가입니다.
+                            멀티채널 전자음악, 사운드 설치, 오디오비주얼, 그리고 VR·XR 환경의 퍼포먼스 음악을 오가며,
+                            실재하는 공간의 스피커 배열과 헤드폰·HMD 기반의 가상 음향 렌더링 사이를 왕복해 왔습니다.
                         </p>
                         <p>
-                            김은준은 인공지능, 센서 데이터, 인간의 움직임과 같은 기술적 요소들을 음악과 시각예술에 통합하는 데에 관심이 많으며, 이를 통해 사운드와 퍼포먼스, 공간 사이의 상호작용을 탐구합니다. 특히, 인간의 움직임이나 환경 데이터를 수집하여 실시간으로 소리와 이미지를 생성하거나 조작하는 시스템 설계 및 작곡 방식에 집중해 왔습니다.
+                            센서 데이터와 인간의 움직임, 인공지능을 실시간 시스템에 통합해 소리와 이미지를
+                            생성하거나 변형하는 방식에 집중합니다. 최근 작업은 잔향 자체를 구조적 재료로
+                            다루거나(<em>Lucid</em>), 앰비소닉 패닝을 작곡의 한 층위로 사용하거나(<em>interrupt</em>),
+                            사중주를 8채널 스피커 배열에 분산시키는(<em>Sequential</em>) 방식으로 전개되었습니다.
+                            이전 작업들은 L-시스템(<em>Axiom</em>), 신체 관절 추적(<em>DATENPROTOKOLL</em>),
+                            환경 데이터(<em>island air</em>)에서 생성 논리를 끌어왔습니다.
                         </p>
                         <p>
-                            그의 연구는 다음과 같은 질문들을 중심으로 전개됩니다:<br>
+                            그의 연구는 다음 질문들을 중심으로 전개됩니다:<br>
+                            · 움직이는 소리에 대한 지각은 가상 렌더링과 실재 공간에서 어떻게 달라지는가?<br>
                             · 기술은 음악의 구성 방식에 어떤 새로운 가능성을 제시할 수 있는가?<br>
-                            · 감각의 경계를 확장하는 음악 경험은 어떻게 설계될 수 있는가?<br>
-                            · 인공지능은 예술가의 창작 도구로서 어떻게 작동할 수 있는가?
-                        </p>
-                        <p>
-                            또한 그는 공간 기반 사운드 디자인, 비정형 공연 구조, 실시간 인터랙티브 시스템, 멀티채널 오디오 등 기술적 구조 안에서 음악적 서사를 구성하는 방식에도 깊은 관심을 갖고 있습니다. 현재는 특히 인공지능 기술을 음악 작곡 및 사운드 퍼포먼스에 적용하는 방법을 연구하고 있으며, 음악 내에서 인간 창작자와 알고리즘이 어떻게 협력할 수 있는지, 그 경계를 실험하는 작업을 지속하고 있습니다.
+                            · 인공지능은 창작의 협업자로서 어떻게 작동할 수 있는가?
                         </p>
                     </div>
 
                     <ul class="tag-list">
-                        <li>Computer Music</li>
+                        <li>Spatial Audio</li>
+                        <li>Multichannel Diffusion</li>
+                        <li>Ambisonics</li>
+                        <li>Real-time Systems</li>
+                        <li>VR / XR</li>
                         <li>Electro-acoustic</li>
-                        <li>Fixed Media</li>
-                        <li>Contemporary Composition</li>
-                        <li>Sound Art</li>
-                        <li>Interactive Media</li>
-                        <li>Media Art</li>
+                        <li>Computer Music</li>
                         <li>AI</li>
                     </ul>
                 </div>
 
                 <div class="profile-slider">
-                    <img src="images/profile01.jpeg" alt="Portrait 1" class="profile-slide active">
-                    <img src="images/profile02.jpeg" alt="Portrait 2" class="profile-slide">
+                    <img src="images/profile01.jpg" alt="Portrait 1" class="profile-slide active">
+                    <img src="images/profile02.jpg" alt="Portrait 2" class="profile-slide">
                 </div>
+            </div>
 
-            </div> <div class="cv-container">
-                
+            <div class="cv-container">
                 <div class="cv-section">
                     <h4 class="cv-title">Education</h4>
                     <div class="cv-row">
                         <div class="cv-year">2020 - 2023</div>
-                        <div class="cv-content">
-                            <div class="cv-item">
-                                <strong>Korea National University of Arts</strong> (Seoul, Korea)<br>
-                                School of Music, Electro-acoustic Music Composition, M.A.
-                            </div>
-                        </div>
+                        <div class="cv-content"><div class="cv-item">
+                            <strong>Korea National University of Arts</strong> (Seoul, Korea)<br>
+                            School of Music, Electro-acoustic Music Composition, M.A.
+                        </div></div>
                     </div>
                     <div class="cv-row">
                         <div class="cv-year">2013 - 2019</div>
-                        <div class="cv-content">
-                            <div class="cv-item">
-                                <strong>Chugye University for the Arts</strong> (Seoul, Korea)<br>
-                                School of Music, Piano Performance, B.M.
-                            </div>
-                        </div>
+                        <div class="cv-content"><div class="cv-item">
+                            <strong>Chugye University for the Arts</strong> (Seoul, Korea)<br>
+                            School of Music, Piano Performance, B.M.
+                        </div></div>
                     </div>
                 </div>
 
@@ -300,42 +390,31 @@
                     <h4 class="cv-title">Research</h4>
                     <div class="cv-row">
                         <div class="cv-year">2023 - present</div>
-                        <div class="cv-content">
-                            <div class="cv-item">
-                                <strong>KEAMS (Korea Electro-Acoustic Music Society)</strong><br>
-                                Researcher
-                            </div>
-                        </div>
+                        <div class="cv-content"><div class="cv-item">
+                            <strong>KEAMS (Korea Electro-Acoustic Music Society)</strong><br>Researcher
+                        </div></div>
                     </div>
                     <div class="cv-row">
                         <div class="cv-year">2021 - 2024</div>
-                        <div class="cv-content">
-                            <div class="cv-item">
-                                <strong>Korea National University of Arts CT Graduate School Team AI</strong><br>
-                                Music Researcher
-                            </div>
-                        </div>
+                        <div class="cv-content"><div class="cv-item">
+                            <strong>Korea National University of Arts CT Graduate School Team AI</strong><br>Music Researcher
+                        </div></div>
                     </div>
                 </div>
 
                 <div class="cv-section">
-                    <h4 class="cv-title">Music & Performance</h4>
-
+                    <h4 class="cv-title">Music &amp; Performance</h4>
                     <div class="cv-row">
                         <div class="cv-year">2026</div>
-                        <div class="cv-content">
-                            <div class="cv-item"><strong>AI Robot Opera</strong> | 'Sequential' for Quartet and Live Electronics, Nam June Paik Art Center, Yongin</div>
-                        </div>
+                        <div class="cv-content"><div class="cv-item"><strong>AI Robot Opera</strong> | 'Sequential' for Quartet and Live Electronics, Nam June Paik Art Center, Yongin</div></div>
                     </div>
-                    
                     <div class="cv-row">
                         <div class="cv-year">2025</div>
                         <div class="cv-content">
-                            <div class="cv-item"><strong>AI Robot Opera <span style="font-size: 0.8em; vertical-align: middle; letter-spacing: 0.05em;">pre-opening</span></strong> | 'Sequential' for Viola, Piano and Live Electronics, Nam June Paik Art Center, Yongin</div>
+                            <div class="cv-item"><strong>AI Robot Opera <span style="font-size:0.8em;letter-spacing:0.05em">pre-opening</span></strong> | 'Sequential' for Viola, Piano and Live Electronics, Nam June Paik Art Center, Yongin</div>
                             <div class="cv-item"><strong>SICMF 2025</strong> | 'Lucid' for Piano and Live Electronics, CKL Stage, Seoul</div>
                         </div>
                     </div>
-
                     <div class="cv-row">
                         <div class="cv-year">2024</div>
                         <div class="cv-content">
@@ -345,14 +424,10 @@
                             <div class="cv-item"><strong>ICMC 2024 'Sound in Motion'</strong> | 'interrupt' for Violin and Live Electronics, Hanyang University Recital Hall, Seoul</div>
                         </div>
                     </div>
-
                     <div class="cv-row">
                         <div class="cv-year">2023</div>
-                        <div class="cv-content">
-                            <div class="cv-item"><strong>Arts Korea Lab Opening Festival</strong> | 'DATENPROTOKOLL' for Live Electronics and performance, Arts Korea Lab, Seoul</div>
-                        </div>
+                        <div class="cv-content"><div class="cv-item"><strong>Arts Korea Lab Opening Festival</strong> | 'DATENPROTOKOLL' for Live Electronics and performance, Arts Korea Lab, Seoul</div></div>
                     </div>
-
                     <div class="cv-row">
                         <div class="cv-year">2022</div>
                         <div class="cv-content">
@@ -361,18 +436,16 @@
                             <div class="cv-item"><strong>fest-m 2022</strong> | 'Axiom' for Audiovisual Live, Seoul National University of Education Concert Hall, Seoul</div>
                         </div>
                     </div>
-
                     <div class="cv-row">
                         <div class="cv-year">2021</div>
                         <div class="cv-content">
                             <div class="cv-item"><strong>Korea National University of Arts 'MTK042'</strong> | 'Axiom' for Audiovisual Live, Lee Kang Sook Hall, Seoul</div>
                             <div class="cv-item"><strong>fest-m 2021</strong> | 'Splash' for Piano and Live Electronics, Seoul National University of Education Concert Hall, Seoul</div>
                             <div class="cv-item"><strong>Korea National University of Arts 'MTK041'</strong> | '선 線, line' for Live Electronics, Lee Kang Sook Hall, Seoul</div>
-                            <div class="cv-item"><strong>ARKO Art & Tech final selection</strong> | 'Doppelgänger' for VR performance Music Director, Platform-L Live Hall, Seoul</div>
+                            <div class="cv-item"><strong>ARKO Art &amp; Tech final selection</strong> | 'Doppelgänger' for VR performance Music Director, Platform-L Live Hall, Seoul</div>
                             <div class="cv-item"><strong>The 25th Bucheon International Fantastic Film Festival(BIFAN)</strong> | '202 201' Music Composition</div>
                         </div>
                     </div>
-
                     <div class="cv-row">
                         <div class="cv-year">2020</div>
                         <div class="cv-content">
@@ -384,30 +457,22 @@
 
                 <div class="cv-section">
                     <h4 class="cv-title">Exhibition</h4>
-                    
                     <div class="cv-row">
                         <div class="cv-year">2023</div>
                         <div class="cv-content">
                             <div class="cv-item"><strong>Nodeul Island Art Space 'New Artist Contest' selection</strong> | 'Axiom', 'Island Air' for Audiovisual, Nodeul Gallery, Seoul</div>
-                            <div class="cv-item"><strong>KT&G SangsangMadang 'Play with Disco'</strong> | 'DATENPROTOKOLL D.I.S.C.O', Chuncheon KT&G, Chuncheon</div>
+                            <div class="cv-item"><strong>KT&amp;G SangsangMadang 'Play with Disco'</strong> | 'DATENPROTOKOLL D.I.S.C.O', Chuncheon KT&amp;G, Chuncheon</div>
                         </div>
                     </div>
-
                     <div class="cv-row">
                         <div class="cv-year">2021</div>
-                        <div class="cv-content">
-                            <div class="cv-item"><strong>Ulsan Contemporary Art Festival 'Vibrating Boundaries'</strong> | '선 線, line' for 4ch Tape, Jung-gu, Ulsan</div>
-                        </div>
+                        <div class="cv-content"><div class="cv-item"><strong>Ulsan Contemporary Art Festival 'Vibrating Boundaries'</strong> | '선 線, line' for 4ch Tape, Jung-gu, Ulsan</div></div>
                     </div>
-
                     <div class="cv-row">
                         <div class="cv-year">2020</div>
-                        <div class="cv-content">
-                            <div class="cv-item"><strong>The 20th Seoul International ALT Cinema & Media Festival(nemaf2020)</strong> | 'REGULATION' for Audiovisual, Post Territory Ujeongguk, Seoul</div>
-                        </div>
+                        <div class="cv-content"><div class="cv-item"><strong>The 20th Seoul International ALT Cinema &amp; Media Festival(nemaf2020)</strong> | 'REGULATION' for Audiovisual, Post Territory Ujeongguk, Seoul</div></div>
                     </div>
                 </div>
-
             </div>
         </div>
     </section>
@@ -421,58 +486,611 @@
     </section>
 
     <footer>
-        <div class="container">
-            <p>&copy; 2025 KIM EUNJUN. All rights reserved.</p>
-        </div>
+        <div class="container"><p>&copy; 2026 KIM EUNJUN. All rights reserved.</p></div>
     </footer>
-
-    <script src="wave-bg.js"></script>
-
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            const slides = document.querySelectorAll('.profile-slide');
-            let currentSlide = 0;
-            const slideInterval = 5000; // 5초마다 변경
-
-            if(slides.length > 1) {
-                setInterval(() => {
-                    // 현재 이미지 숨김 (투명하게)
-                    slides[currentSlide].classList.remove('active');
-                    
-                    // 다음 순서 계산
-                    currentSlide = (currentSlide + 1) % slides.length;
-                    
-                    // 다음 이미지 표시 (불투명하게)
-                    slides[currentSlide].classList.add('active');
-                }, slideInterval);
-            }
-        });
-    </script>
 
     <a href="#" id="backToTop" class="back-to-top" title="Go to top">↑</a>
 
-    <script>
-        const backToTopButton = document.getElementById("backToTop");
+<script>
+/* ==============================================================
+   작품 데이터
 
-        window.addEventListener("scroll", () => {
-            // 스크롤을 300px 이상 내리면 버튼이 나타남
-            if (window.scrollY > 300) {
-                backToTopButton.classList.add("show");
+   필드 설명:
+   ch        채널 수
+   diffusion 스피커 배치와 확산 방식
+   input     시스템을 구동하는 입력
+   tools     사용한 소프트웨어 / 하드웨어
+   speakers  배치도 좌표 [x, y] (0~100, 위쪽이 무대)
+   headphone true 면 스피커 배열 대신 헤드폰 아이콘을 표시
+
+   참고: Lucid 악보(p.3)에는 공연장 잔향을 실측했다고 적혀 있으나
+        실제로는 측정하지 않았습니다. 악보와 상세 페이지도 정정이 필요합니다.
+
+   3D 지도 좌표 — 전부 실제 데이터에서 나옵니다:
+   x = chN   (2ch ~ 8ch)
+   y = live  (0 = 고정 매체, 1 = 실시간 입력 구동)
+   z = y     (연도)
+   hmd:true  헤드폰 / HMD 가 관여하는 작업 (지도에서 속 빈 원)
+   ============================================================== */
+const WORKS = [
+  {
+    t:'Sequential', y:2026, href:'details/project11_sequential.html', img:'images/work11.jpg',
+    sub:'for Quartet and Live Electronics', venue:'Nam June Paik Art Center, Yongin',
+    ch:'8ch', chN:8,
+    diffusion:'Hall corners + performer square',
+    input:'Four performers (Va, Vc, Fl, Pf) · data from AI',
+    tools:'Max 9, SuperCollider',
+    speakers:[[14,20],[86,20],[14,88],[86,88],[36,44],[64,44],[36,66],[64,66]],
+    live:1.0
+  },
+  {
+    t:'Lucid', y:2025, href:'details/project10_lucid.html', img:'images/work10.jpg',
+    sub:'for Piano and Live Electronics', venue:'SICMF 2025, CKL Stage',
+    ch:'8ch', chN:8,
+    diffusion:'Octagonal array',
+    input:'Piano',
+    tools:'Max 9, Jitter',
+    speakers:[[36,22],[64,22],[18,42],[82,42],[18,66],[82,66],[36,86],[64,86]],
+    live:0.9
+  },
+  {
+    t:'Axiom 2', y:2024, href:'details/project09_axiom2.html', img:'images/work09.jpg',
+    sub:'for Audio-visual', venue:'Arts Korea Lab Festival',
+    ch:'2ch', chN:2,
+    diffusion:'Front and rear, one each',
+    input:'Recursive functions based on an L-system',
+    tools:'Max 9',
+    speakers:[[50,24],[50,84]],
+    live:0.15
+  },
+  {
+    t:'Diamond Dust', y:2024, href:'details/project08_diamondDust.html', img:'images/work08.jpg',
+    sub:'for XR with AI Character', venue:'Ars Electronica / SIGGRAPH Asia',
+    ch:'2ch', chN:2,
+    diffusion:'Headphone — Unity 3D spatialisation',
+    input:'—',
+    tools:'Unity 3D, AI character',
+    headphone:true, hmd:true,
+    live:0.5
+  },
+  {
+    t:'island air', y:2023, href:'details/project07_islandAir.html', img:'images/work07.jpg',
+    sub:'for Realtime Audio-visual', venue:'Nodeul Gallery, Seoul',
+    ch:'2ch', chN:2,
+    diffusion:'Front L/R',
+    input:'Air-quality API keyed to location',
+    tools:'Max 8, Jitter',
+    speakers:[[22,24],[78,24]],
+    live:0.7
+  },
+  {
+    t:'DATENPROTOKOLL', y:2022, href:'details/project06_datenprotokoll.html', img:'images/work06.jpg',
+    sub:'for Performers and Live Electronics', venue:'Arts Korea Lab / KT&G Chuncheon',
+    ch:'2ch', chN:2,
+    diffusion:'Front L/R',
+    input:'Performers’ body-joint data from an Azure Kinect DK',
+    tools:'Max 8, Unity 3D, Azure Kinect DK',
+    speakers:[[22,24],[78,24]],
+    live:1.0
+  },
+  {
+    t:'interrupt', y:2022, href:'details/project05_interrupt.html', img:'images/work05_0.jpg',
+    sub:'for Violin and Live Electronics', venue:'ICMC 2024 / MTK043',
+    ch:'4ch', chN:4,
+    diffusion:'Front L/R, rear L/R · ambisonic panning',
+    input:'Violin',
+    tools:'Max 8',
+    speakers:[[22,24],[78,24],[22,84],[78,84]],
+    live:0.9
+  },
+  {
+    t:'Axiom', y:2021, href:'details/project04_axiom.html', img:'images/work04.jpg',
+    sub:'for Audio-visual Live', venue:'HfK Bremen / fest-m / MTK042',
+    ch:'4ch', chN:4,
+    diffusion:'Front L/R, rear L/R',
+    input:'Recursive functions based on an L-system',
+    tools:'SuperCollider, Jitter, Max 8',
+    speakers:[[22,24],[78,24],[22,84],[78,84]],
+    live:0.6
+  },
+  {
+    t:'선 線, line', y:2021, href:'details/project03_line.html', img:'images/work03.jpg',
+    sub:'for Live Electronics / Fixed Media', venue:'MTK041 / Ulsan Contemporary Art Festival',
+    ch:'4ch (fixed media)', chN:4,
+    diffusion:'Front L/R, rear L/R',
+    input:'—',
+    tools:'Max 8',
+    speakers:[[22,24],[78,24],[22,84],[78,84]],
+    live:0.1
+  },
+  {
+    t:'Doppelgänger', y:2021, href:'details/project02_doppelganger.html', img:'images/work02.jpg',
+    sub:'for Audience-participatory VR performance', venue:'ARKO Art & Tech, Platform-L',
+    ch:'6ch', chN:6,
+    diffusion:'Front L/R, centre L/R, rear L/R',
+    input:'Motion capture · Meta Quest 2',
+    tools:'Max 8, Unity 3D',
+    speakers:[[22,24],[78,24],[22,54],[78,54],[22,84],[78,84]],
+    hmd:true, live:1.0
+  },
+  {
+    t:'REGULATION', y:2020, href:'details/project01_regulation.html', img:'images/work01.jpg',
+    sub:'for Audio-visual', venue:'nemaf2020 / Arts Korea Lab',
+    ch:'2ch', chN:2,
+    diffusion:'Front L/R',
+    input:'Logic derived from the symbol system of Stockhausen’s Plus-Minus',
+    tools:'Max 8',
+    speakers:[[22,24],[78,24]],
+    live:0.15
+  }
+];
+
+
+/* ==============================================================
+   1. 공간 지도
+   ============================================================== */
+(function () {
+    const wrap = document.getElementById('mapWrap');
+    const canvas = document.getElementById('mapCanvas');
+    const tip = document.getElementById('mapTip');
+    const ctx = canvas.getContext('2d');
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    let W = 0, H = 0, dpr = 1;
+
+    // --- 카메라 상태 ---
+    const DEF_ROT_Y = -0.62, DEF_ROT_X = 0.30;
+    let rotY = DEF_ROT_Y, rotX = DEF_ROT_X;
+    /* 자동 회전 대신 관성. 드래그로 "던지면" 그 속도로 돌다가 마찰로 멈춥니다.
+       처음 한 번만 살짝 굴려서 3D 라는 걸 알아채게 합니다. */
+    let velY = reduceMotion ? 0 : 0.014;
+    let velX = 0;
+    let resetting = false;
+    const FRICTION = 0.955;
+
+    // 드래그 상태 — frame() 이 참조하므로 반드시 먼저 선언되어야 합니다
+    let dragging = false, lastX = 0, lastY = 0, moved = 0;
+    const CAM_Z = 4.2;
+    // 풀블리드라 화면 폭이 매우 넓어질 수 있어, 시야각을 캔버스 크기에 맞춥니다
+    let FOV = 560;
+
+    // --- 연도를 -1~1 의 깊이로 ---
+    const years = WORKS.map(function (w) { return w.y; });
+    const Y_MIN = Math.min.apply(null, years), Y_MAX = Math.max.apply(null, years);
+    function zOf(y) { return ((y - Y_MIN) / (Y_MAX - Y_MIN)) * 2 - 1; }
+
+    /* 각 작품의 3D 좌표 — 세 축 전부 실제 스펙에서 나옵니다.
+       x = 채널 수, y = 고정 매체 ↔ 실시간 입력, z = 연도 */
+    const CH_MIN = 2, CH_MAX = 8;
+    const PTS = WORKS.map(function (w) {
+        return {
+            w: w,
+            x: ((w.chN - CH_MIN) / (CH_MAX - CH_MIN)) * 2 - 1,
+            y: w.live * 2 - 1,
+            z: zOf(w.y)
+        };
+    });
+    // 궤적선을 위해 연도순 정렬
+    const PATH = PTS.slice().sort(function (a, b) { return a.w.y - b.w.y; });
+
+    function resize() {
+        dpr = Math.min(window.devicePixelRatio || 1, 2);
+        W = wrap.clientWidth; H = wrap.clientHeight;
+        canvas.width = Math.round(W * dpr);
+        canvas.height = Math.round(H * dpr);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+        /* 높이를 기준으로 잡되, 좁은 화면에서는 폭에 맞춰 줄입니다.
+           (라벨이 오른쪽으로 뻗으므로 폭 여유를 조금 둡니다) */
+        FOV = Math.max(280, Math.min(H, W * 0.8));
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    /* 3D 점 하나를 화면 좌표로 투영합니다.
+       Y축 회전 → X축 회전 → 원근 나눗셈 순서입니다. */
+    function project(p) {
+        const cy = Math.cos(rotY), sy = Math.sin(rotY);
+        let x = p.x * cy - p.z * sy;
+        let z = p.x * sy + p.z * cy;
+        const cx = Math.cos(rotX), sx = Math.sin(rotX);
+        let y = p.y * cx - z * sx;
+        z = p.y * sx + z * cx;
+
+        const d = z + CAM_Z;
+        const s = FOV / Math.max(0.15, d);
+        return { x: W / 2 + x * s, y: H / 2 - y * s, s: s / FOV, d: d };
+    }
+
+    // 깊이에 따라 옅어지는 회색 (뒤로 갈수록 배경에 묻힘)
+    function fog(d, base) {
+        const t = Math.max(0, Math.min(1, (d - (CAM_Z - 1.5)) / 3));
+        return base * (1 - t * 0.78);
+    }
+
+    function line(a, b, alpha, width) {
+        ctx.beginPath();
+        ctx.moveTo(a.x, a.y);
+        ctx.lineTo(b.x, b.y);
+        ctx.strokeStyle = 'rgba(26,26,26,' + alpha + ')';
+        ctx.lineWidth = width || 1;
+        ctx.stroke();
+    }
+
+    function drawBox() {
+        const c = [];
+        for (let i = 0; i < 8; i++) {
+            c.push(project({
+                x: (i & 1) ? 1 : -1,
+                y: (i & 2) ? 1 : -1,
+                z: (i & 4) ? 1 : -1
+            }));
+        }
+        const edges = [[0,1],[2,3],[4,5],[6,7],[0,2],[1,3],[4,6],[5,7],[0,4],[1,5],[2,6],[3,7]];
+        edges.forEach(function (e) {
+            const a = c[e[0]], b = c[e[1]];
+            line(a, b, fog((a.d + b.d) / 2, 0.13));
+        });
+
+        // 바닥 격자 (y = -1 평면)
+        const N = 4;
+        for (let i = 0; i <= N; i++) {
+            const t = (i / N) * 2 - 1;
+            const p1 = project({ x: t, y: -1, z: -1 });
+            const p2 = project({ x: t, y: -1, z: 1 });
+            line(p1, p2, fog((p1.d + p2.d) / 2, 0.07));
+            const p3 = project({ x: -1, y: -1, z: t });
+            const p4 = project({ x: 1, y: -1, z: t });
+            line(p3, p4, fog((p3.d + p4.d) / 2, 0.07));
+        }
+    }
+
+    /* 축 라벨은 작품 이름과 확실히 구별되어야 합니다.
+       작품 이름 = Pretendard, 진한 회색, 후광 있음
+       축 라벨   = 모노스페이스, 자간 넓게, 옅은 회색, 후광 없음 */
+    function axisTextAt(p, text, size) {
+        const fs = size || (W < 700 ? 10 : 11);
+        ctx.save();
+        ctx.font = '500 ' + fs + 'px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
+        if ('letterSpacing' in ctx) ctx.letterSpacing = '1.6px';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillStyle = 'rgba(158,158,158,' + Math.max(0.6, fog(p.d, 1)) + ')';
+        ctx.fillText(text, p.x, p.y);
+        ctx.restore();
+    }
+
+    /* 축 라벨.
+       꼭짓점마다 값을 붙이면 세 축이 만나는 모서리에 라벨이 몰리고,
+       나머지 꼭짓점은 비어 보여 들쭉날쭉해집니다.
+       그래서 꼭짓점이 아니라 "모서리 한가운데"에 축마다 하나씩,
+       범위를 함께 적습니다. 라벨은 총 세 개뿐입니다. */
+    function drawAxisLabels() {
+        const items = [
+            { p: { x: 0,     y: -1.24, z: 1.24 }, t: 'CHANNELS  2 → 8' },
+            { p: { x: -1.34, y: 0,     z: 1.06 }, t: 'INPUT  FIXED → LIVE' },
+            { p: { x: 1.30,  y: -1.28, z: 0    }, t: 'YEAR  ' + Y_MIN + ' → ' + Y_MAX }
+        ];
+
+        // 회전하다 겹치면 뒤엣것을 생략합니다
+        const drawn = [];
+        items.forEach(function (it) {
+            const pr = project(it.p);
+            for (let i = 0; i < drawn.length; i++) {
+                const dx = drawn[i].x - pr.x, dy = drawn[i].y - pr.y;
+                if (Math.sqrt(dx * dx + dy * dy) < 60) return;
+            }
+            drawn.push(pr);
+            axisTextAt(pr, it.t, W < 700 ? 10 : 12);
+        });
+    }
+
+    function drawPath() {
+        for (let i = 0; i < PATH.length - 1; i++) {
+            const a = project(PATH[i]), b = project(PATH[i + 1]);
+            line(a, b, fog((a.d + b.d) / 2, 0.20));
+        }
+    }
+
+    let hovered = null;
+
+    function drawNodes() {
+        // 먼 것부터 그려야 앞의 것이 위에 올라옵니다
+        const list = PTS.map(function (p) {
+            const pr = project(p);
+            return { p: p, pr: pr };
+        }).sort(function (a, b) { return b.pr.d - a.pr.d; });
+
+        list.forEach(function (it) {
+            const w = it.p.w, pr = it.pr;
+            const isHover = (hovered === it.p);
+
+            // 채널 수 → 반지름 (원근 반영)
+            const base = 4.5 + Math.min(9, w.chN) * 0.85;
+            const r = base * pr.s * FOV / 560 * (isHover ? 1.55 : 1);
+            const a = Math.max(0.18, fog(pr.d, 1));
+
+            ctx.beginPath();
+            ctx.arc(pr.x, pr.y, Math.max(2, r), 0, Math.PI * 2);
+            if (w.hmd) {
+                ctx.fillStyle = '#FFF';
+                ctx.fill();
+                ctx.strokeStyle = 'rgba(26,26,26,' + a + ')';
+                ctx.lineWidth = 1.8;
+                ctx.stroke();
             } else {
-                backToTopButton.classList.remove("show");
+                ctx.fillStyle = 'rgba(26,26,26,' + a + ')';
+                ctx.fill();
+            }
+
+            // 바닥으로 떨어지는 수직 보조선 — 높이(규모)를 읽히게 합니다
+            const foot = project({ x: it.p.x, y: -1, z: it.p.z });
+            line(pr, foot, fog(pr.d, 0.09));
+
+            // 라벨
+            const la = isHover ? 1 : Math.max(0, fog(pr.d, 0.95) - 0.10);
+            if (la > 0.06) {
+                ctx.font = (isHover ? '700 ' : '500 ') + '12px Pretendard, -apple-system, sans-serif';
+                ctx.textAlign = 'left';
+                ctx.textBaseline = 'middle';
+                // 격자 위에서도 읽히도록 배경색 테두리를 먼저 깝니다
+                ctx.lineWidth = 3.5;
+                ctx.lineJoin = 'round';
+                ctx.strokeStyle = 'rgba(247,247,247,' + (la * 0.9) + ')';
+                ctx.strokeText(w.t, pr.x + r + 8, pr.y);
+                ctx.fillStyle = 'rgba(38,38,38,' + la + ')';
+                ctx.fillText(w.t, pr.x + r + 8, pr.y);
             }
         });
+        return list;
+    }
 
-        backToTopButton.addEventListener("click", (e) => {
-            e.preventDefault(); // 기본 링크 동작 방지
-            window.scrollTo({
-                top: 0,
-                behavior: "smooth" // 부드럽게 스크롤
-            });
+    let projected = [];
+
+    function frame() {
+        if (resetting) {
+            // 기본 시점으로 부드럽게 복귀
+            rotY += (DEF_ROT_Y - rotY) * 0.13;
+            rotX += (DEF_ROT_X - rotX) * 0.13;
+            if (Math.abs(rotY - DEF_ROT_Y) < 0.003 && Math.abs(rotX - DEF_ROT_X) < 0.003) {
+                rotY = DEF_ROT_Y; rotX = DEF_ROT_X; resetting = false;
+            }
+        } else if (!dragging) {
+            // 손을 뗀 뒤에만 관성이 적용됩니다. 상하 제한 없이 360도 회전합니다.
+            rotY += velY;
+            rotX += velX;
+            velY *= FRICTION;
+            velX *= FRICTION;
+            if (Math.abs(velY) < 0.00002) velY = 0;
+            if (Math.abs(velX) < 0.00002) velX = 0;
+        }
+
+        ctx.clearRect(0, 0, W, H);
+        drawBox();
+        drawAxisLabels();
+        drawPath();
+        projected = drawNodes();
+
+        requestAnimationFrame(frame);
+    }
+    frame();
+
+    // ---------- 상호작용 ----------
+    function pointerPos(e) {
+        const r = wrap.getBoundingClientRect();
+        const t = e.touches ? e.touches[0] : e;
+        return { x: t.clientX - r.left, y: t.clientY - r.top };
+    }
+
+    function hitTest(pos) {
+        let best = null, bestD = 24;
+        projected.forEach(function (it) {
+            const dx = it.pr.x - pos.x, dy = it.pr.y - pos.y;
+            const d = Math.sqrt(dx * dx + dy * dy);
+            if (d < bestD) { bestD = d; best = it; }
         });
-    </script>
+        return best;
+    }
 
-</body>
-</html>
+    function showTip(it, pos) {
+        const w = it.p.w;
+        tip.hidden = false;
+        tip.style.left = it.pr.x + 'px';
+        tip.style.top = it.pr.y + 'px';
+        tip.innerHTML =
+            '<strong>' + w.t + '</strong>' +
+            '<span>' + w.y + ' · ' + w.sub + '</span><br>' +
+            '<span>' + w.ch + '</span>';
+    }
+
+    function onMove(e) {
+        const pos = pointerPos(e);
+        if (dragging) {
+            const dx = pos.x - lastX, dy = pos.y - lastY;
+            moved += Math.abs(dx) + Math.abs(dy);
+
+            // 드래그 중에는 1:1 로 따라오고,
+            // 마지막 이동량이 그대로 "던지는 속도" 가 됩니다.
+            const dvY = dx * 0.007;
+            const dvX = dy * -0.005;   // 위아래 반전 (아래로 끌면 위에서 내려다보도록)
+            rotY += dvY;
+            rotX += dvX;               // 제한 없음 — 위에서도 아래에서도 볼 수 있습니다
+            velY = dvY;
+            velX = dvX;
+
+            lastX = pos.x; lastY = pos.y;
+            return;
+        }
+        const hit = hitTest(pos);
+        hovered = hit ? hit.p : null;
+        if (hit) showTip(hit, pos);
+        else tip.hidden = true;
+    }
+
+    // 하단 HUD(안내문·Reset 버튼) 위에서 시작한 입력은 회전/클릭으로 처리하지 않습니다.
+    // 안 그러면 Reset 을 눌렀을 때 근처 점이 잡혀 작품 페이지로 넘어갑니다.
+    function onHud(e) {
+        const t = e.target;
+        return !!(t && t.closest && t.closest('.map-hud'));
+    }
+
+    function onDown(e) {
+        if (onHud(e)) return;
+        dragging = true; moved = 0;
+        const pos = pointerPos(e);
+        lastX = pos.x; lastY = pos.y;
+        velY = 0; velX = 0;          // 잡는 순간 관성 정지
+        wrap.classList.add('dragging', 'touched');
+    }
+
+    function onUp(e) {
+        if (onHud(e)) { dragging = false; wrap.classList.remove('dragging'); return; }
+        if (dragging && moved < 6) {
+            // 끌지 않고 눌렀으면 클릭으로 간주
+            const hit = hitTest(pointerPos(e.changedTouches ? { touches: e.changedTouches } : e));
+            if (hit) { window.location.href = hit.p.w.href; return; }
+            velY = 0; velX = 0;
+        }
+        dragging = false;
+        wrap.classList.remove('dragging');
+    }
+
+    wrap.addEventListener('mousemove', onMove);
+    wrap.addEventListener('mousedown', onDown);
+    window.addEventListener('mouseup', onUp);
+    wrap.addEventListener('mouseleave', function () {
+        hovered = null; tip.hidden = true;
+    });
+
+    // 기본 시점으로 복귀. 여러 바퀴 돌았어도 가까운 쪽으로 돌아가도록 각도를 정규화합니다.
+    document.getElementById('mapReset').addEventListener('click', function (e) {
+        e.stopPropagation();
+        const TAU = Math.PI * 2;
+        rotY = ((rotY - DEF_ROT_Y + Math.PI) % TAU + TAU) % TAU - Math.PI + DEF_ROT_Y;
+        rotX = ((rotX - DEF_ROT_X + Math.PI) % TAU + TAU) % TAU - Math.PI + DEF_ROT_X;
+        velY = 0; velX = 0;
+        resetting = true;
+    });
+
+    wrap.addEventListener('touchstart', onDown, { passive: true });
+    wrap.addEventListener('touchmove', function (e) {
+        if (dragging) { e.preventDefault(); onMove(e); }
+    }, { passive: false });
+    wrap.addEventListener('touchend', onUp);
+})();
+
+
+/* ==============================================================
+   2. 작품 목록 — 정렬 + 스펙
+   ============================================================== */
+(function () {
+    const listEl = document.getElementById('workList');
+
+    function specRow(label, value) {
+        const todo = (typeof value === 'string' && value.indexOf('확인 필요') !== -1);
+        const v = todo
+            ? value.replace('확인 필요', '<span class="todo">확인 필요</span>')
+            : value;
+        return '<dt>' + label + '</dt><dd>' + v + '</dd>';
+    }
+
+    /* 스피커 배치 다이어그램.
+       정사각형은 공연/전시 공간, 위쪽이 무대(FRONT), 점이 스피커입니다. */
+    function speakerDiagram(w) {
+        if (w.headphone) {
+            return '<svg class="sdiag" viewBox="0 0 100 100" aria-hidden="true">' +
+                '<rect class="room" x="5" y="5" width="90" height="90" rx="2"/>' +
+                '<path class="hp" d="M36 56 A14 14 0 0 1 64 56"/>' +
+                '<rect class="hp-cup" x="32" y="55" width="7" height="13" rx="3"/>' +
+                '<rect class="hp-cup" x="61" y="55" width="7" height="13" rx="3"/>' +
+                '<text class="dlbl" x="50" y="88">HEADPHONE</text>' +
+                '</svg>';
+        }
+        const dots = (w.speakers || []).map(function (p) {
+            return '<circle class="spk" cx="' + p[0] + '" cy="' + p[1] + '" r="4.2"/>';
+        }).join('');
+        return '<svg class="sdiag" viewBox="0 0 100 100" aria-hidden="true">' +
+            '<rect class="room" x="5" y="5" width="90" height="90" rx="2"/>' +
+            '<text class="dlbl" x="50" y="14">FRONT</text>' +
+            dots + '</svg>';
+    }
+
+    function render(list) {
+        listEl.innerHTML = '';
+        list.forEach(function (w) {
+            const row = document.createElement('a');
+            row.className = 'wrow';
+            row.href = w.href;
+            row.innerHTML =
+                '<img class="wbg" src="' + w.img + '" alt="' + w.t + '">' +
+                '<span class="wscrim"></span>' +
+                '<div class="winner">' +
+                    '<div class="wtext">' +
+                        '<h3>' + w.t + '</h3>' +
+                        '<div class="wsub">' + w.sub + '</div>' +
+                        '<div class="wmeta">' + w.y + ' &nbsp;·&nbsp; ' + w.venue + '</div>' +
+                    '</div>' +
+                    '<div class="spec">' +
+                        '<dl>' +
+                            specRow('Channels', w.ch) +
+                            specRow('Diffusion', w.diffusion) +
+                            specRow('Input', w.input) +
+                            specRow('Tools', w.tools) +
+                        '</dl>' +
+                        '<div class="sdiag-wrap">' +
+                            '<div class="sdiag-cap">Speaker Layout</div>' +
+                            speakerDiagram(w) +
+                        '</div>' +
+                    '</div>' +
+                '</div>';
+            listEl.appendChild(row);
+        });
+    }
+
+    const SORTERS = {
+        channels: function () { return WORKS.slice().sort(function (a, b) { return b.chN - a.chN || b.y - a.y; }); },
+        live:     function () { return WORKS.slice().sort(function (a, b) { return b.live - a.live || b.y - a.y; }); },
+        year:     function () { return WORKS.slice().sort(function (a, b) { return b.y - a.y; }); }
+    };
+
+    render(SORTERS.channels());
+
+    document.getElementById('wtoolbar').addEventListener('click', function (e) {
+        const btn = e.target.closest('button');
+        if (!btn) return;
+        this.querySelectorAll('button').forEach(function (b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+        render(SORTERS[btn.dataset.sort]());
+    });
+})();
+
+
+/* ==============================================================
+   3. 기존 동작 (프로필 슬라이드 / 맨 위로)
+   ============================================================== */
+document.addEventListener('DOMContentLoaded', function () {
+    const slides = document.querySelectorAll('.profile-slide');
+    let cur = 0;
+    if (slides.length > 1) {
+        setInterval(function () {
+            slides[cur].classList.remove('active');
+            cur = (cur + 1) % slides.length;
+            slides[cur].classList.add('active');
+        }, 5000);
+    }
+});
+
+const backToTopButton = document.getElementById('backToTop');
+window.addEventListener('scroll', function () {
+    backToTopButton.classList.toggle('show', window.scrollY > 300);
+});
+backToTopButton.addEventListener('click', function (e) {
+    e.preventDefault();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+</script>
+
+<script src="interference-bg.js"></script>
+
 </body>
 </html>

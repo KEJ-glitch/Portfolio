@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>[프로토타입 v2] Signal &amp; Noise - KIM EUNJUN</title>
+
+    <link rel="icon" href="images/favicon.png" type="image/x-icon">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+
+    <style>
+        /* ==========================================================
+           프로토타입 v2 전용 스타일
+           ========================================================== */
+        /*
+          [수정] style.css 의 .hero 에는 overflow:hidden 이 걸려 있습니다.
+          텍스트 캔버스는 여백(PAD)만큼 좌우로 삐져나오기 때문에
+          그대로 두면 가장자리가 잘립니다. 프로토타입에서는 풀어줍니다.
+          (배경 파형 캔버스는 hero 크기에 딱 맞춰 그려지므로 넘칠 일이 없습니다)
+        */
+        .hero { padding: 120px 0 200px; overflow: visible; }
+
+        /* 텍스트 캔버스는 여백(PAD)만큼 좌우로 삐져나오도록 일부러 크게 잡습니다.
+           그 때문에 페이지에 가로 스크롤이 생기는 것만 막아줍니다. */
+        html, body { overflow-x: hidden; }
+
+        #heroTextWrap { position: relative; z-index: 1; display: inline-block; }
+        #textCanvas   { display: block; }
+
+        /*
+          [중요] 두 가지를 동시에 처리합니다.
+          1) flow-root : 자식(h1/divider/p)의 마진이 바깥으로 빠져나가는
+             마진 겹침을 막습니다. 없으면 높이가 작게 측정돼 아래가 잘립니다.
+          2) width: max-content : 가장 긴 줄("TECHNOLOGY") 기준으로 폭이 잡힙니다.
+             이걸 고정하지 않으면 캔버스 안으로 옮겨진 뒤 부모 폭에 맞춰
+             다시 계산되면서 글자가 오른쪽부터 잘립니다.
+        */
+        #heroText {
+            display: flow-root;
+            width: max-content;
+            transform-origin: 0 0;
+        }
+
+        /* ---------- 컨트롤 패널 ---------- */
+        .proto-panel {
+            position: fixed; right: 24px; bottom: 24px; z-index: 9999;
+            width: 300px; padding: 18px 20px;
+            background: rgba(255,255,255,0.93);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--line-color);
+            border-radius: 10px;
+            font-size: 0.82rem; line-height: 1.5;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+            max-height: 82vh; overflow-y: auto;
+        }
+        .proto-panel h4 {
+            margin: 0 0 12px; font-size: 0.72rem;
+            letter-spacing: 0.08em; text-transform: uppercase;
+            color: var(--text-secondary);
+        }
+        .proto-status {
+            padding: 9px 11px; border-radius: 6px;
+            margin-bottom: 16px; font-size: 0.76rem;
+        }
+        .proto-status.on  { background: #EAF6EE; color: #1B6B36; }
+        .proto-status.off { background: #F0F0F0; color: #666; }
+
+        .proto-row { margin-bottom: 14px; }
+        .proto-row:last-child { margin-bottom: 0; }
+        .proto-row label {
+            display: block; margin-bottom: 6px;
+            color: var(--text-secondary); font-size: 0.76rem;
+        }
+        .proto-row input[type="range"] { width: 100%; }
+
+        .proto-seg { display: flex; gap: 5px; flex-wrap: wrap; }
+        .proto-seg button {
+            flex: 1 1 auto; min-width: 58px; padding: 7px 4px;
+            font: inherit; font-size: 0.72rem;
+            background: #fff; border: 1px solid var(--line-color);
+            border-radius: 5px; cursor: pointer; transition: all 0.2s;
+        }
+        .proto-seg button:hover { border-color: #bbb; }
+        .proto-seg button.active {
+            background: var(--text-primary); color: #fff;
+            border-color: var(--text-primary);
+        }
+
+        .proto-note {
+            margin-top: 14px; padding-top: 12px;
+            border-top: 1px solid var(--line-color);
+            font-size: 0.71rem; color: #999;
+        }
+        .proto-btn {
+            width: 100%; padding: 9px; margin-top: 8px;
+            font: inherit; font-size: 0.75rem;
+            background: var(--text-primary); color: #fff;
+            border: none; border-radius: 5px; cursor: pointer;
+        }
+        .proto-btn[hidden] { display: none; }
+
+        .proto-toggle {
+            position: fixed; right: 16px; bottom: 16px; z-index: 10000;
+            width: 44px; height: 44px; border-radius: 50%;
+            background: var(--text-primary); color: #fff;
+            border: none; font-size: 1.1rem; cursor: pointer;
+            display: none;
+        }
+        @media (max-width: 900px) {
+            .proto-toggle { display: block; }
+            .proto-panel { right: 12px; left: 12px; bottom: 70px; width: auto; }
+            .proto-panel[hidden] { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="container header-flex">
+            <a href="index.html" class="logo">김은준 KIM EUNJUN.</a>
+            <nav>
+                <a href="prototype-hero.html">v1</a>
+                <a href="index.html">← 실제 사이트</a>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero">
+        <canvas id="heroWave" class="hero-canvas" aria-hidden="true"></canvas>
+
+        <div class="container">
+            <div id="heroTextWrap">
+                <div id="heroText">
+                    <p class="subtitle">Composer &amp; Sound Artist</p>
+                    <h1>SOUND<br>TECHNOLOGY<br>ART.</h1>
+                    <div class="divider"></div>
+                    <p class="description">소리로 기술과 예술의<br>새로운 감각을 탐구합니다.</p>
+                    <p class="description">Exploring new sensibilities <br>in technology and art through sound.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            <h2 class="section-title">NOTES</h2>
+            <p class="description" style="max-width:660px">
+                배경은 사인파 대신 fBm 노이즈로 흐르고, 필름 그레인과 신호 끊김(dropout)이 섞입니다.
+                스크롤 속도 · 포인터 · 기기 기울기에 반응합니다.
+            </p>
+            <p class="description" style="max-width:660px">
+                텍스트 왜곡이 켜진 환경에서는 딜레이 라인처럼 잔상이 따라붙습니다.
+                왜곡 상태에서도 드래그 선택과 Cmd/Ctrl+F 검색이 그대로 동작합니다.
+            </p>
+        </div>
+    </section>
+
+    <button class="proto-toggle" id="protoToggle" aria-label="컨트롤 열기">⚙</button>
+
+    <div class="proto-panel" id="protoPanel">
+        <h4>Prototype v2 — Signal &amp; Noise</h4>
+
+        <div id="protoStatus" class="proto-status off">확인 중…</div>
+
+        <div class="proto-row">
+            <label>텍스트 모드</label>
+            <div class="proto-seg" id="modeSeg">
+                <button data-mode="off">Off</button>
+                <button data-mode="drift">Drift</button>
+                <button data-mode="resonance" class="active">Resonance</button>
+                <button data-mode="noise">Noise</button>
+            </div>
+        </div>
+
+        <div class="proto-row">
+            <label>왜곡 강도 <span id="intensityVal">1.0</span></label>
+            <input type="range" id="intensity" min="0" max="2.5" step="0.1" value="1">
+        </div>
+
+        <div class="proto-row">
+            <label>배경 파형 <span id="bgVal">1.0</span></label>
+            <input type="range" id="bgIntensity" min="0" max="2.5" step="0.1" value="1">
+        </div>
+
+        <div class="proto-row">
+            <label>노이즈 양 <span id="grainVal">1.0</span></label>
+            <input type="range" id="grain" min="0" max="2.5" step="0.1" value="1">
+        </div>
+
+        <div class="proto-row">
+            <label>노이즈 픽셀 크기 <span id="grainPxVal">3px</span></label>
+            <input type="range" id="grainPx" min="1" max="10" step="1" value="3">
+        </div>
+
+        <div class="proto-row">
+            <label>진단 (잘림 원인 추적)</label>
+            <div class="proto-seg" id="debugSeg">
+                <button data-dbg="bounds">경계 표시</button>
+                <button data-dbg="nosync">변환 동기화 끄기</button>
+            </div>
+        </div>
+
+        <button class="proto-btn" id="tiltBtn" hidden>기기 기울기 센서 켜기</button>
+
+        <div class="proto-note" id="protoDebug" style="font-family:monospace;white-space:pre-line;line-height:1.7"></div>
+        <div class="proto-note" id="protoNote"></div>
+    </div>
+
+    <script>
+    /* ============================================================
+       0. 공용 상태 & 유틸
+       ============================================================ */
+    const PROTO = {
+        bgGain: 1,
+        grainGain: 1,
+        wave: { t: 0, energy: 0, px: 0.5, py: 0.5, tiltX: 0, tiltY: 0 }
+    };
+
+    // --- 값 노이즈 (fBm) ---
+    function fract(x) { return x - Math.floor(x); }
+    function hash1(n) { return fract(Math.sin(n * 12.9898) * 43758.5453123); }
+
+    function noise1(x) {
+        const i = Math.floor(x), f = fract(x);
+        const u = f * f * (3 - 2 * f);
+        return hash1(i) * (1 - u) + hash1(i + 1) * u;
+    }
+    function fbm(x, octaves) {
+        octaves = octaves || 4;
+        let v = 0, amp = 0.5, freq = 1;
+        for (let k = 0; k < octaves; k++) {
+            v += amp * noise1(x * freq);
+            amp *= 0.5;
+            freq *= 2;
+        }
+        return v * 2 - 1;
+    }
+
+    /* --- 그레인 타일 ---
+       block 픽셀짜리 정사각형을 채워서 "굵은 픽셀" 노이즈를 만듭니다.
+       타일 크기를 block 의 배수로 잡아야 이어붙일 때 이음새가 안 생깁니다. */
+    const GRAIN = { block: 3, tile: null, size: 0 };
+
+    function buildGrain(block) {
+        const size = block * 42;                 // 항상 block 의 배수
+        const c = document.createElement('canvas');
+        c.width = c.height = size;
+        const g = c.getContext('2d');
+        for (let y = 0; y < size; y += block) {
+            for (let x = 0; x < size; x += block) {
+                const v = (Math.random() * 255) | 0;
+                g.fillStyle = 'rgb(' + v + ',' + v + ',' + v + ')';
+                g.fillRect(x, y, block, block);
+            }
+        }
+        GRAIN.block = block;
+        GRAIN.tile = c;
+        GRAIN.size = size;
+    }
+    buildGrain(3);
+
+    /* 그레인을 영역에 깔아줍니다.
+       오프셋을 block 단위로 스냅해서 픽셀 격자가 흐트러지지 않게 합니다. */
+    function paintGrain(ctx, w, h, alpha) {
+        if (alpha <= 0.003 || !GRAIN.tile) return;
+        const b = GRAIN.block, size = GRAIN.size;
+        const ox = -Math.floor(Math.random() * (size / b)) * b;
+        const oy = -Math.floor(Math.random() * (size / b)) * b;
+        ctx.save();
+        ctx.globalAlpha = alpha;
+        ctx.globalCompositeOperation = 'multiply';
+        ctx.imageSmoothingEnabled = false;
+        for (let gx = ox; gx < w; gx += size) {
+            for (let gy = oy; gy < h; gy += size) {
+                ctx.drawImage(GRAIN.tile, gx, gy);
+            }
+        }
+        ctx.restore();
+    }
+
+    const IS_TOUCH = window.matchMedia('(hover: none)').matches;
+
+
+    /* ============================================================
+       1. 배경 레이어 — 모든 브라우저 + 모바일
+       ============================================================ */
+    (function () {
+        const canvas = document.getElementById('heroWave');
+        if (!canvas) return;
+
+        const host = canvas.parentElement;
+        const ctx = canvas.getContext('2d');
+        const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        let w, h, dpr;
+        let px = 0.5, tpx = 0.5;
+        let py = 0.5, tpy = 0.5;
+        let energy = 0, tEnergy = 0;
+        let tiltX = 0, ttiltX = 0;
+        let tiltY = 0, ttiltY = 0;
+        let t = 0;
+        let lastScroll = window.scrollY;
+
+        const DPR_CAP = IS_TOUCH ? 1.5 : 2;
+        const STEP = IS_TOUCH ? 6 : 4;
+
+        function resize() {
+            dpr = Math.min(window.devicePixelRatio || 1, DPR_CAP);
+            w = host.offsetWidth;
+            h = host.offsetHeight;
+            canvas.width = Math.round(w * dpr);
+            canvas.height = Math.round(h * dpr);
+            canvas.style.width = w + 'px';
+            canvas.style.height = h + 'px';
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        function setPointer(cx, cy) {
+            const r = host.getBoundingClientRect();
+            tpx = (cx - r.left) / r.width;
+            tpy = (cy - r.top) / r.height;
+        }
+        host.addEventListener('mousemove', function (e) { setPointer(e.clientX, e.clientY); });
+        host.addEventListener('mouseleave', function () { tpx = 0.5; tpy = 0.5; });
+        host.addEventListener('touchmove', function (e) {
+            const tch = e.touches[0];
+            if (tch) setPointer(tch.clientX, tch.clientY);
+        }, { passive: true });
+        host.addEventListener('touchend', function () { tpx = 0.5; tpy = 0.5; });
+
+        window.addEventListener('scroll', function () {
+            const d = Math.abs(window.scrollY - lastScroll);
+            lastScroll = window.scrollY;
+            tEnergy = Math.min(1, tEnergy + d * 0.012);
+        }, { passive: true });
+
+        window.addEventListener('deviceorientation', function (e) {
+            if (e.gamma === null) return;
+            ttiltX = Math.max(-1, Math.min(1, (e.gamma || 0) / 45));
+            ttiltY = Math.max(-1, Math.min(1, ((e.beta || 0) - 45) / 45));
+        });
+
+        const lines = [
+            { amp: 20, scale: 0.0032, speed: 0.0038, seed: 0,   alpha: 0.10 },
+            { amp: 30, scale: 0.0022, speed: 0.0026, seed: 40,  alpha: 0.070 },
+            { amp: 40, scale: 0.0015, speed: 0.0018, seed: 80,  alpha: 0.050 },
+            { amp: 52, scale: 0.0010, speed: 0.0012, seed: 120, alpha: 0.034 }
+        ];
+
+        let dropout = null;
+        function maybeDropout() {
+            if (dropout) {
+                dropout.life -= 1;
+                if (dropout.life <= 0) dropout = null;
+                return;
+            }
+            if (Math.random() < 0.004 + energy * 0.02) {
+                dropout = {
+                    x0: Math.random() * w,
+                    width: 60 + Math.random() * 220,
+                    shift: (Math.random() - 0.5) * 60,
+                    life: 4 + Math.random() * 10
+                };
+            }
+        }
+
+        function frame() {
+            t += 1;
+            px += (tpx - px) * 0.045;
+            py += (tpy - py) * 0.045;
+            tiltX += (ttiltX - tiltX) * 0.05;
+            tiltY += (ttiltY - tiltY) * 0.05;
+            energy += (tEnergy - energy) * 0.06;
+            tEnergy *= 0.94;
+
+            PROTO.wave.t = t;
+            PROTO.wave.energy = energy;
+            PROTO.wave.px = px;
+            PROTO.wave.py = py;
+            PROTO.wave.tiltX = tiltX;
+            PROTO.wave.tiltY = tiltY;
+
+            maybeDropout();
+
+            const gain = PROTO.bgGain;
+            ctx.clearRect(0, 0, w, h);
+
+            lines.forEach(function (ln, i) {
+                const dir = (i % 2 === 0) ? 1 : -1;
+                const lean = (px - 0.5 + tiltX * 0.5) * 1.3 * dir;
+                const amp = ln.amp * Math.max(0.25, 1 + lean) * (1 + energy * 1.5) * gain;
+                const yc = h * (0.30 + i * 0.145) + (py - 0.5 + tiltY * 0.4) * 22 * dir;
+
+                ctx.beginPath();
+                for (let x = 0; x <= w; x += STEP) {
+                    let n = fbm(x * ln.scale + t * ln.speed + ln.seed, 4);
+                    if (dropout && x >= dropout.x0 && x <= dropout.x0 + dropout.width) {
+                        n += dropout.shift / amp;
+                    }
+                    const y = yc + n * amp;
+                    if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+                }
+                ctx.strokeStyle = 'rgba(26,26,26,' + (ln.alpha * (1 + energy * 0.7)) + ')';
+                ctx.lineWidth = 1.1;
+                ctx.stroke();
+            });
+
+            paintGrain(ctx, w, h, 0.035 * PROTO.grainGain * (1 + energy * 0.6));
+
+            if (!reduceMotion) requestAnimationFrame(frame);
+        }
+        frame();
+    })();
+
+
+    /* ============================================================
+       2. 텍스트 레이어 — HTML-in-Canvas (Chrome + 플래그)
+       ============================================================ */
+    (function () {
+        const statusEl = document.getElementById('protoStatus');
+        const noteEl = document.getElementById('protoNote');
+
+        const probe = document.createElement('canvas').getContext('2d');
+        const SUPPORTED = typeof probe.drawElementImage === 'function';
+
+        if (!SUPPORTED) {
+            statusEl.className = 'proto-status off';
+            statusEl.textContent = 'HTML-in-Canvas 미지원 — 배경 레이어만 동작합니다.';
+            noteEl.innerHTML =
+                '텍스트 왜곡을 보려면 데스크톱 Chrome Canary 에서 ' +
+                '<code>chrome://flags/#canvas-draw-element</code> 를 켜주세요. ' +
+                '모바일에서는 배경 레이어(파형·그레인·기울기)만 적용됩니다.';
+            bindControls(null);
+            return;
+        }
+
+        /* [수정] 웹폰트(Pretendard)가 로드되기 전에 크기를 재면
+           대체 폰트 기준으로 작게 측정돼서 글자가 잘립니다.
+           반드시 fonts.ready 이후에 측정합니다. */
+        const ready = (document.fonts && document.fonts.ready)
+            ? document.fonts.ready
+            : new Promise(function (r) { window.addEventListener('load', r); });
+
+        ready.then(setup);
+
+        function setup() {
+            const wrap = document.getElementById('heroTextWrap');
+            const textEl = document.getElementById('heroText');
+
+            // 좌우/상하 여백 — 왜곡이 이 범위를 넘지 않도록 아래에서 clamp 합니다
+            const PAD_X = IS_TOUCH ? 70 : 140;
+            const PAD_Y = 50;
+
+            let cssW, cssH, dpr = 1;
+            let canvas, ctx;
+
+            /* 텍스트 크기 측정.
+
+               부모 박스(getBoundingClientRect)만 재면 안 됩니다.
+               "TECHNOLOGY" 처럼 줄바꿈이 불가능한 긴 단어는 부모 박스를
+               넘어서 그려지는데, 그 넘친 부분은 박스 크기에 반영되지 않습니다.
+               그래서 자식 요소 박스와 Range(실제 글자가 찍히는 범위)까지
+               전부 확인해서 가장 오른쪽/아래쪽 끝을 찾습니다. */
+            const SAFETY = 16;
+            function measure() {
+                const base = textEl.getBoundingClientRect();
+                let right = base.right;
+                let bottom = base.bottom;
+
+                // 1) 자식 요소들의 박스
+                textEl.querySelectorAll('*').forEach(function (el) {
+                    const r = el.getBoundingClientRect();
+                    if (r.width || r.height) {
+                        right = Math.max(right, r.right);
+                        bottom = Math.max(bottom, r.bottom);
+                    }
+                });
+
+                // 2) 실제 글자가 찍히는 범위 (박스를 넘어간 글자까지 포착)
+                try {
+                    const rng = document.createRange();
+                    rng.selectNodeContents(textEl);
+                    const rects = rng.getClientRects();
+                    for (let i = 0; i < rects.length; i++) {
+                        right = Math.max(right, rects[i].right);
+                        bottom = Math.max(bottom, rects[i].bottom);
+                    }
+                } catch (e) { /* Range 실패 시 위 값만 사용 */ }
+
+                return {
+                    w: Math.ceil(right - base.left) + SAFETY,
+                    h: Math.ceil(bottom - base.top) + SAFETY
+                };
+            }
+
+            /* [단순화] 딱 맞게 재려고 애쓰지 않고 넉넉하게 잡습니다.
+
+               단, 캔버스만 키우면 소용없습니다.
+               drawElementImage 는 "요소 박스"를 넘어간 글자를 잘라내므로
+               요소 폭(textEl.style.width)을 같이 넓혀야 합니다.
+               텍스트는 왼쪽 정렬이라 폭을 키워도 보이는 모습은 그대로입니다. */
+            function computeWidth() {
+                const m = measure();
+                const h1El = textEl.querySelector('h1');
+                const h1W = h1El ? Math.ceil(h1El.getBoundingClientRect().width) : 0;
+
+                // 컨테이너 안에서 쓸 수 있는 폭 (모바일에서 과하게 커지지 않도록)
+                const host = wrap.parentElement || document.body;
+                const avail = Math.floor(host.clientWidth) - 8;
+
+                // 넉넉한 기본 폭: 데스크톱이면 1000 근처, 좁은 화면이면 화면에 맞춤
+                const roomy = Math.max(320, Math.min(1000, avail));
+
+                return Math.max(m.w, h1W + SAFETY, roomy);
+            }
+
+            let contentW = computeWidth();
+            textEl.style.width = contentW + 'px';
+            let contentH = measure().h;    // 폭 고정 후 높이 재확인
+
+            cssW = contentW + PAD_X * 2;
+            cssH = contentH + PAD_Y * 2;
+
+            canvas = document.createElement('canvas');
+            canvas.id = 'textCanvas';
+            canvas.setAttribute('layoutsubtree', '');
+            canvas.style.marginLeft = (-PAD_X) + 'px';
+            canvas.style.marginTop = (-PAD_Y) + 'px';
+            canvas.style.marginBottom = (-PAD_Y) + 'px';
+
+            wrap.appendChild(canvas);
+            canvas.appendChild(textEl);
+            ctx = canvas.getContext('2d');
+
+            function applySize() {
+                dpr = Math.min(window.devicePixelRatio || 1, IS_TOUCH ? 1.5 : 2);
+                canvas.style.width = cssW + 'px';
+                canvas.style.height = cssH + 'px';
+                canvas.width = Math.round(cssW * dpr);
+                canvas.height = Math.round(cssH * dpr);
+                reportDebug();
+            }
+
+            /* 잘림이 계속되면 이 숫자들을 확인합니다.
+               text 폭보다 canvas 폭이 (PAD_X*2) 만큼 크지 않다면 측정이 잘못된 것이고,
+               h1 폭이 text 폭보다 크다면 부모 폭 계산이 잘못된 것입니다. */
+            function reportDebug() {
+                const dbg = document.getElementById('protoDebug');
+                if (!dbg) return;
+                const h1 = textEl.querySelector('h1');
+                const tr = textEl.getBoundingClientRect();
+                const hr = h1 ? h1.getBoundingClientRect() : { width: 0 };
+                dbg.textContent =
+                    'text ' + Math.round(tr.width) + '×' + Math.round(tr.height) +
+                    ' / h1 ' + Math.round(hr.width) +
+                    ' / canvas ' + cssW + '×' + cssH +
+                    ' / pad ' + PAD_X + ',' + PAD_Y;
+            }
+            applySize();
+
+            // 리사이즈 시 텍스트를 잠깐 밖으로 빼서 다시 재고 되돌립니다
+            let rt = null;
+            window.addEventListener('resize', function () {
+                clearTimeout(rt);
+                rt = setTimeout(function () {
+                    textEl.style.transform = '';
+                    textEl.style.width = '';           // 자연 폭으로 되돌려 다시 계산
+                    wrap.appendChild(textEl);          // 캔버스 밖으로
+                    contentW = computeWidth();
+                    textEl.style.width = contentW + 'px';
+                    contentH = measure().h;
+                    canvas.appendChild(textEl);        // 다시 안으로
+                    cssW = contentW + PAD_X * 2;
+                    cssH = contentH + PAD_Y * 2;
+                    applySize();
+                }, 180);
+            });
+
+            let mode = 'resonance';
+            let intensity = 1;
+
+            // --- 진단용 상태 ---
+            let showBounds = false;    // 캔버스/텍스트 경계를 눈으로 확인
+            let syncOff = false;       // 변환 동기화를 꺼서 피드백 루프 여부 확인
+            let lastTf = null;         // drawElementImage 가 돌려준 변환
+
+            const SLICES = IS_TOUCH ? 14 : 26;
+            const ECHOES = [
+                { delay: 26, alpha: 0.16,  spread: 1.5 },
+                { delay: 54, alpha: 0.10,  spread: 2.2 },
+                { delay: 88, alpha: 0.055, spread: 3.0 }
+            ];
+
+            function displace(tt, i, amp, quantize) {
+                let n = fbm(i * 0.42 + tt * 0.02, 3)
+                      + fbm(i * 1.7 + tt * 0.055, 2) * 0.4;
+                if (quantize) n = Math.round(n * 5) / 5;   // sample-and-hold
+                return n * amp;
+            }
+
+            // 여백을 넘어가면 잘리므로 항상 범위 안으로 가둡니다
+            const LIMIT = PAD_X - 8;
+            function clampX(v) { return Math.max(-LIMIT, Math.min(LIMIT, v)); }
+
+            function paint() {
+                const wv = PROTO.wave;
+                const t = wv.t;
+                const energy = wv.energy;
+
+                /* [핵심 수정] 지난 프레임에 걸어둔 변환을 먼저 지웁니다.
+                   drawElementImage 는 요소의 현재 스타일을 반영해 그리므로,
+                   변환이 걸린 채로 다시 그리면 변환이 계속 누적됩니다.
+                   (누적된 scale 때문에 글자가 캔버스를 넘어가 잘립니다) */
+                textEl.style.transform = '';
+
+                ctx.reset();
+                ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+                let hitTransform = null;
+
+                if (mode === 'off' || intensity === 0) {
+                    ctx.translate(PAD_X, PAD_Y);
+                    hitTransform = ctx.drawElementImage(textEl, 0, 0);
+
+                } else if (mode === 'drift') {
+                    const dx = clampX(fbm(t * 0.012, 3) * 9 * intensity * (1 + energy));
+                    const dy = fbm(t * 0.009 + 50, 3) * 5 * intensity * (1 + energy);
+                    ctx.translate(PAD_X + dx, PAD_Y + dy);
+                    hitTransform = ctx.drawElementImage(textEl, 0, 0);
+
+                } else {
+                    const isNoise = (mode === 'noise');
+                    const contentH = cssH - PAD_Y * 2;
+                    const sliceH = contentH / SLICES;
+                    const amp = (isNoise ? 14 : 9) * intensity * (1 + energy * 1.8);
+                    const mid = Math.floor(SLICES / 2);
+
+                    // 잔상(딜레이 라인) — 통짜로 그려 비용을 낮춤
+                    ECHOES.forEach(function (e) {
+                        const dx = clampX(displace(t - e.delay, mid, amp * e.spread, isNoise));
+                        ctx.save();
+                        ctx.globalAlpha = e.alpha * intensity;
+                        ctx.translate(PAD_X + dx, PAD_Y);
+                        ctx.drawElementImage(textEl, 0, 0);
+                        ctx.restore();
+                    });
+
+                    // 본체 — 슬라이스별 변위
+                    for (let i = 0; i < SLICES; i++) {
+                        ctx.save();
+                        ctx.beginPath();
+                        // 클립 영역도 PAD_Y 만큼 내려서 잡아야 위아래가 안 잘립니다
+                        ctx.rect(0, PAD_Y + i * sliceH, cssW, sliceH + 1);
+                        ctx.clip();
+
+                        let dx = displace(t, i, amp, isNoise);
+                        if (isNoise && hash1(i * 7.3 + Math.floor(t / 6)) > 0.94) {
+                            dx += (hash1(i + t) - 0.5) * 70 * intensity;
+                        }
+                        dx = clampX(dx);
+
+                        ctx.translate(PAD_X + dx, PAD_Y);
+                        const tr = ctx.drawElementImage(textEl, 0, 0);
+                        if (i === mid) hitTransform = tr;
+
+                        ctx.restore();
+                    }
+
+                    paintGrain(ctx, cssW, cssH,
+                        (isNoise ? 0.07 : 0.04) * PROTO.grainGain);
+                }
+
+                // --- 진단: 경계 표시 ---
+                if (showBounds) {
+                    ctx.save();
+                    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+                    // 빨강 = 캔버스 전체 영역
+                    ctx.strokeStyle = 'rgba(220,40,40,0.85)';
+                    ctx.lineWidth = 2;
+                    ctx.strokeRect(1, 1, cssW - 2, cssH - 2);
+                    // 파랑 = 텍스트가 놓일 것으로 계산한 영역
+                    ctx.strokeStyle = 'rgba(40,90,220,0.85)';
+                    ctx.strokeRect(PAD_X, PAD_Y, cssW - PAD_X * 2, cssH - PAD_Y * 2);
+                    ctx.restore();
+                }
+
+                lastTf = hitTransform;
+
+                /* 브라우저에 요소의 실제 화면 위치를 알려줍니다.
+                   (선택·클릭·검색 위치를 맞추기 위한 것으로, 그림 자체와는 별개입니다) */
+                if (hitTransform && !syncOff) {
+                    textEl.style.transform = hitTransform.toString();
+                }
+            }
+
+            canvas.onpaint = paint;
+
+            // 진단 정보를 주기적으로 갱신 (매 프레임 DOM 갱신은 부담이라 400ms 간격)
+            setInterval(function () {
+                const dbg = document.getElementById('protoDebug');
+                if (!dbg) return;
+                const h1 = textEl.querySelector('h1');
+                const hr = h1 ? h1.getBoundingClientRect() : { width: 0 };
+                let tfStr = '—';
+                if (lastTf) {
+                    tfStr = 'a' + (+lastTf.a).toFixed(2) + ' d' + (+lastTf.d).toFixed(2) +
+                            ' e' + (+lastTf.e).toFixed(1) + ' f' + (+lastTf.f).toFixed(1);
+                }
+                // content 가 h1 보다 넓어야 정상입니다. 좁으면 아직 측정이 덜 잡힌 것.
+                const ok = contentW >= Math.round(hr.width);
+                dbg.textContent =
+                    'content ' + contentW + '×' + contentH + (ok ? '  OK' : '  ← 너무 좁음') + '\n' +
+                    'h1 ' + Math.round(hr.width) + '  canvas ' + cssW + '×' + cssH + '\n' +
+                    'pad ' + PAD_X + ',' + PAD_Y + '  dpr ' + dpr + '\n' +
+                    'tf ' + tfStr;
+            }, 400);
+
+            const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            (function loop() {
+                if (typeof canvas.requestPaint === 'function') canvas.requestPaint();
+                else paint();
+                if (!reduceMotion) requestAnimationFrame(loop);
+            })();
+
+            statusEl.className = 'proto-status on';
+            statusEl.textContent = 'HTML-in-Canvas 활성화됨 — 텍스트가 캔버스 안에서 렌더링 중입니다.';
+            noteEl.innerHTML =
+                'Resonance = 딜레이 라인 잔상 · Noise = 양자화 + 신호 끊김. ' +
+                '왜곡 중에도 선택 · 복사 · 페이지 내 검색이 동작합니다.';
+
+            bindControls({
+                setMode: function (m) { mode = m; },
+                setIntensity: function (v) { intensity = v; },
+                toggleBounds: function (on) { showBounds = on; },
+                toggleSyncOff: function (on) {
+                    syncOff = on;
+                    if (on) textEl.style.transform = '';
+                }
+            });
+        }
+    })();
+
+
+    /* ============================================================
+       3. 컨트롤 패널
+       ============================================================ */
+    function bindControls(api) {
+        const seg = document.getElementById('modeSeg');
+        const intensityInput = document.getElementById('intensity');
+        const intensityVal = document.getElementById('intensityVal');
+        const bgInput = document.getElementById('bgIntensity');
+        const bgVal = document.getElementById('bgVal');
+        const grainInput = document.getElementById('grain');
+        const grainVal = document.getElementById('grainVal');
+        const grainPxInput = document.getElementById('grainPx');
+        const grainPxVal = document.getElementById('grainPxVal');
+        const tiltBtn = document.getElementById('tiltBtn');
+        const toggle = document.getElementById('protoToggle');
+        const panel = document.getElementById('protoPanel');
+
+        bgInput.addEventListener('input', function () {
+            PROTO.bgGain = parseFloat(bgInput.value);
+            bgVal.textContent = PROTO.bgGain.toFixed(1);
+        });
+        grainInput.addEventListener('input', function () {
+            PROTO.grainGain = parseFloat(grainInput.value);
+            grainVal.textContent = PROTO.grainGain.toFixed(1);
+        });
+
+        // 노이즈 픽셀 크기: 타일을 다시 만듭니다
+        grainPxInput.addEventListener('input', function () {
+            const b = parseInt(grainPxInput.value, 10);
+            buildGrain(b);
+            grainPxVal.textContent = b + 'px';
+        });
+        grainPxVal.textContent = grainPxInput.value + 'px';
+
+        toggle.addEventListener('click', function () { panel.hidden = !panel.hidden; });
+        if (IS_TOUCH) panel.hidden = true;
+
+        // --- 진단 버튼 (토글) ---
+        const debugSeg = document.getElementById('debugSeg');
+        if (debugSeg) {
+            debugSeg.addEventListener('click', function (e) {
+                const btn = e.target.closest('button');
+                if (!btn || !api) return;
+                const on = !btn.classList.contains('active');
+                btn.classList.toggle('active', on);
+                if (btn.dataset.dbg === 'bounds') api.toggleBounds(on);
+                if (btn.dataset.dbg === 'nosync') api.toggleSyncOff(on);
+            });
+            if (!api) {
+                debugSeg.querySelectorAll('button').forEach(function (b) {
+                    b.disabled = true;
+                    b.style.opacity = 0.4;
+                    b.style.cursor = 'not-allowed';
+                });
+            }
+        }
+
+        if (typeof DeviceOrientationEvent !== 'undefined' &&
+            typeof DeviceOrientationEvent.requestPermission === 'function') {
+            tiltBtn.hidden = false;
+            tiltBtn.addEventListener('click', function () {
+                DeviceOrientationEvent.requestPermission().then(function (res) {
+                    tiltBtn.textContent = (res === 'granted') ? '기울기 센서 켜짐' : '권한이 거부되었습니다';
+                    tiltBtn.disabled = true;
+                }).catch(function () {
+                    tiltBtn.textContent = '센서를 사용할 수 없습니다';
+                    tiltBtn.disabled = true;
+                });
+            });
+        }
+
+        if (!api) {
+            seg.querySelectorAll('button').forEach(function (b) {
+                b.disabled = true;
+                b.style.opacity = 0.4;
+                b.style.cursor = 'not-allowed';
+            });
+            intensityInput.disabled = true;
+            intensityInput.style.opacity = 0.4;
+            return;
+        }
+
+        seg.addEventListener('click', function (e) {
+            const btn = e.target.closest('button');
+            if (!btn) return;
+            seg.querySelectorAll('button').forEach(function (b) { b.classList.remove('active'); });
+            btn.classList.add('active');
+            api.setMode(btn.dataset.mode);
+        });
+
+        intensityInput.addEventListener('input', function () {
+            const v = parseFloat(intensityInput.value);
+            api.setIntensity(v);
+            intensityVal.textContent = v.toFixed(1);
+        });
+    }
+    </script>
+
+</body>
+</html>

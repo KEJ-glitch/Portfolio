@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>[프로토타입 v3] Diffusion Field vs Wave Field Synthesis</title>
+
+    <link rel="icon" href="images/favicon.png" type="image/x-icon">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+
+    <style>
+        html, body { overflow-x: hidden; }
+
+        .hero { padding: 130px 0 210px; overflow: hidden; }
+        .hero .container { position: relative; z-index: 2; }
+
+        .hero-focus {
+            max-width: 460px; margin-top: 34px; padding-left: 14px;
+            border-left: 2px solid var(--line-color);
+            font-size: 0.92rem; line-height: 1.75;
+            color: var(--text-secondary); word-break: keep-all;
+        }
+
+        /* ---------- 비교용 컨트롤 ---------- */
+        .proto-panel {
+            position: fixed; right: 24px; bottom: 24px; z-index: 9999;
+            width: 292px; padding: 18px 20px;
+            background: rgba(255,255,255,0.93); backdrop-filter: blur(10px);
+            border: 1px solid var(--line-color); border-radius: 10px;
+            font-size: 0.8rem; line-height: 1.5;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+        }
+        .proto-panel h4 {
+            margin: 0 0 12px; font-size: 0.7rem; letter-spacing: 0.09em;
+            text-transform: uppercase; color: var(--text-secondary);
+        }
+        .proto-seg { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+        .proto-seg button {
+            padding: 10px 12px; font: inherit; font-size: 0.78rem; text-align: left;
+            background: #fff; border: 1px solid var(--line-color);
+            border-radius: 5px; cursor: pointer; transition: all 0.2s;
+        }
+        .proto-seg button:hover { border-color: #bbb; }
+        .proto-seg button.active {
+            background: var(--text-primary); color: #fff; border-color: var(--text-primary);
+        }
+        .proto-seg small { display: block; opacity: 0.6; font-size: 0.68rem; margin-top: 2px; }
+
+        .proto-row { margin-bottom: 12px; }
+        .proto-row label {
+            display: block; margin-bottom: 5px;
+            color: var(--text-secondary); font-size: 0.74rem;
+        }
+        .proto-row input[type=range] { width: 100%; }
+        .proto-note {
+            margin-top: 14px; padding-top: 12px;
+            border-top: 1px solid var(--line-color);
+            font-size: 0.7rem; color: #999;
+        }
+
+        @media (max-width: 900px) {
+            .proto-panel { right: 12px; left: 12px; bottom: 12px; width: auto; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="container header-flex">
+            <a href="index.html" class="logo">김은준 KIM EUNJUN.</a>
+            <nav>
+                <a href="prototype-hero-v2.html">v2</a>
+                <a href="index.html">← Site</a>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero">
+        <canvas id="heroCanvas" class="hero-canvas" aria-hidden="true"></canvas>
+        <div class="container">
+            <p class="subtitle">Composer &amp; Sound Artist</p>
+            <h1>SOUND<br>TECHNOLOGY<br>ART.</h1>
+            <div class="divider"></div>
+            <p class="description">Exploring new sensibilities <br>in technology and art through sound.</p>
+            <p class="hero-focus">
+                Current focus — spatial audio, multichannel diffusion,
+                and real-time systems across physical and virtual space.
+            </p>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            <h2 class="section-title">NOTES</h2>
+            <p class="description" style="max-width:660px">
+                <strong>Diffusion field</strong> — eight loudspeakers on an ellipse. The cursor is a
+                virtual source; gains are computed with DBAP (distance-based amplitude panning) and
+                drawn as dot size and line opacity. Move the cursor, or leave it and the source drifts.
+            </p>
+            <p class="description" style="max-width:660px">
+                <strong>Wave field synthesis</strong> — a linear array reconstructs a wavefront from a
+                source behind it. Each speaker fires when the primary wavefront reaches it, and the
+                superposition of those wavelets rebuilds the front. This is Huygens' principle, which
+                is what WFS rests on.
+            </p>
+        </div>
+    </section>
+
+    <div class="proto-panel">
+        <h4>Hero — Compare</h4>
+        <div class="proto-seg" id="modeSeg">
+            <button data-mode="diffusion" class="active">
+                제안 · Diffusion field
+                <small>8채널 배열 + DBAP 패닝</small>
+            </button>
+            <button data-mode="wfs">
+                대안 · Wave field synthesis
+                <small>선형 배열 + 파면 재구성</small>
+            </button>
+        </div>
+
+        <div class="proto-row">
+            <label>Intensity <span id="vInt">1.0</span></label>
+            <input type="range" id="intensity" min="0.2" max="2.2" step="0.1" value="1">
+        </div>
+        <div class="proto-row">
+            <label>Grain <span id="vGrain">1.0</span></label>
+            <input type="range" id="grain" min="0" max="2.5" step="0.1" value="1">
+        </div>
+        <div class="proto-row">
+            <label>Grain pixel <span id="vPx">3px</span></label>
+            <input type="range" id="grainPx" min="1" max="8" step="1" value="3">
+        </div>
+
+        <div class="proto-note" id="note"></div>
+    </div>
+
+<script>
+/* ==============================================================
+   공용 — 그레인 타일
+   매 프레임 픽셀을 생성하면 무거우므로 타일 하나를 만들어
+   블록 단위로 위치만 흔들어 재사용합니다.
+   ============================================================== */
+const GRAIN = { block: 3, tile: null, size: 0 };
+function buildGrain(block) {
+    const size = block * 42;
+    const c = document.createElement('canvas');
+    c.width = c.height = size;
+    const g = c.getContext('2d');
+    for (let y = 0; y < size; y += block) {
+        for (let x = 0; x < size; x += block) {
+            const v = (Math.random() * 255) | 0;
+            g.fillStyle = 'rgb(' + v + ',' + v + ',' + v + ')';
+            g.fillRect(x, y, block, block);
+        }
+    }
+    GRAIN.block = block; GRAIN.tile = c; GRAIN.size = size;
+}
+buildGrain(3);
+
+function paintGrain(ctx, w, h, alpha) {
+    if (alpha <= 0.003 || !GRAIN.tile) return;
+    const b = GRAIN.block, size = GRAIN.size;
+    const ox = -Math.floor(Math.random() * (size / b)) * b;
+    const oy = -Math.floor(Math.random() * (size / b)) * b;
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.globalCompositeOperation = 'multiply';
+    ctx.imageSmoothingEnabled = false;
+    for (let gx = ox; gx < w; gx += size) {
+        for (let gy = oy; gy < h; gy += size) ctx.drawImage(GRAIN.tile, gx, gy);
+    }
+    ctx.restore();
+}
+
+
+/* ==============================================================
+   히어로 렌더러
+   ============================================================== */
+(function () {
+    const canvas = document.getElementById('heroCanvas');
+    const host = canvas.parentElement;
+    const ctx = canvas.getContext('2d');
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    let W = 0, H = 0, dpr = 1, t = 0;
+    let mode = 'diffusion';
+    let intensity = 1, grainGain = 1;
+
+    // 음원 위치 (커서를 부드럽게 따라가고, 손을 놓으면 스스로 표류)
+    let sx = 0.5, sy = 0.45;          // 0~1 정규화
+    let tx = 0.5, ty = 0.45;
+    let idle = true, idleT = Math.random() * 100;
+
+    function resize() {
+        dpr = Math.min(window.devicePixelRatio || 1, 2);
+        W = host.offsetWidth; H = host.offsetHeight;
+        canvas.width = Math.round(W * dpr);
+        canvas.height = Math.round(H * dpr);
+        canvas.style.width = W + 'px';
+        canvas.style.height = H + 'px';
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        recalcCycle();
+    }
+    window.addEventListener('resize', resize);
+
+    function setPointer(cx, cy) {
+        const r = host.getBoundingClientRect();
+        tx = (cx - r.left) / r.width;
+        ty = (cy - r.top) / r.height;
+        idle = false;
+    }
+    host.addEventListener('mousemove', function (e) { setPointer(e.clientX, e.clientY); });
+    host.addEventListener('mouseleave', function () { idle = true; });
+    host.addEventListener('touchmove', function (e) {
+        const p = e.touches[0]; if (p) setPointer(p.clientX, p.clientY);
+    }, { passive: true });
+    host.addEventListener('touchend', function () { idle = true; });
+
+    /* ---------- 모드 A: 디퓨전 필드 (DBAP) ---------- */
+    // 8채널 타원 배열
+    function speakerRing() {
+        const arr = [];
+        const cx = W * 0.5, cy = H * 0.50;
+        const rx = Math.min(W * 0.40, 620), ry = H * 0.40;
+        for (let i = 0; i < 8; i++) {
+            const a = (i / 8) * Math.PI * 2 - Math.PI / 2;
+            arr.push({ x: cx + Math.cos(a) * rx, y: cy + Math.sin(a) * ry });
+        }
+        return arr;
+    }
+
+    /* DBAP — 거리 기반 진폭 패닝.
+       g_i = (1/d_i^a) / sqrt( Σ 1/d_j^(2a) )
+       rs 는 음원이 스피커에 정확히 겹칠 때 발산하는 걸 막는 blur 반경입니다. */
+    function dbap(spk, px, py, a, rs) {
+        const inv = spk.map(function (s) {
+            const dx = s.x - px, dy = s.y - py;
+            const d = Math.sqrt(dx * dx + dy * dy + rs * rs);
+            return 1 / Math.pow(d, a);
+        });
+        let sum = 0;
+        inv.forEach(function (v) { sum += v * v; });
+        const norm = Math.sqrt(sum) || 1;
+        return inv.map(function (v) { return v / norm; });
+    }
+
+    function drawDiffusion(px, py) {
+        const spk = speakerRing();
+        const g = dbap(spk, px, py, 1.0, Math.min(W, H) * 0.10);
+        const gMax = Math.max.apply(null, g) || 1;
+
+        // 음원 → 스피커 연결선 (게인이 클수록 진하게)
+        spk.forEach(function (s, i) {
+            const w = g[i] / gMax;                       // 0~1 로 정규화
+            ctx.beginPath();
+            ctx.moveTo(px, py);
+            ctx.lineTo(s.x, s.y);
+            ctx.strokeStyle = 'rgba(26,26,26,' + (0.10 * w * w * intensity) + ')';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+        });
+
+        // 음원에서 퍼지는 옅은 등고선
+        for (let k = 0; k < 3; k++) {
+            const rr = ((t * 0.9 + k * 90) % 270) + 10;
+            const fade = 1 - rr / 280;
+            ctx.beginPath();
+            ctx.arc(px, py, rr, 0, Math.PI * 2);
+            ctx.strokeStyle = 'rgba(26,26,26,' + (0.07 * fade * intensity) + ')';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+        }
+
+        // 스피커 — 게인만큼 커지고 진해집니다
+        spk.forEach(function (s, i) {
+            const w = g[i] / gMax;
+            const r = 3 + w * 9 * intensity;
+            ctx.beginPath();
+            ctx.arc(s.x, s.y, r, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(26,26,26,' + (0.14 + 0.5 * w * intensity) + ')';
+            ctx.fill();
+        });
+
+        // 음원 표시
+        ctx.beginPath();
+        ctx.arc(px, py, 4.5, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(26,26,26,' + (0.5 * intensity) + ')';
+        ctx.fill();
+    }
+
+    /* ---------- 모드 B: 파면 합성 (WFS) ---------- */
+    const N_WFS = 22;              // 선형 배열 스피커 수
+    const C = 2.6;                 // 화면상 파동 전파 속도 (px/frame)
+    const N_PULSE = 4;             // 동시에 진행되는 펄스 수
+    const FADE_SPAN = 0.50;        // 2차 파면이 사라지는 거리 (화면 긴 변 대비)
+
+    /* 주기는 (가장 먼 스피커의 지연 + 파면이 사라지는 시간) 보다 길어야 합니다.
+       짧으면 파동이 남아 있는 채로 리셋되면서 화면이 튑니다.
+       넓은 화면일수록 더 길어야 하므로 고정값이 아니라 resize 에서 계산합니다. */
+    let CYCLE = 600, PULSE_GAP = 150;
+
+    function recalcCycle() {
+        const maxDelay = Math.sqrt(Math.pow(W * 0.80, 2) + Math.pow(H * 0.35, 2)) / C;
+        const fadeTime = (Math.max(W, H) * FADE_SPAN) / C;
+        CYCLE = Math.max(480, Math.ceil((maxDelay + fadeTime) * 1.12));
+        PULSE_GAP = CYCLE / N_PULSE;
+    }
+
+    function wfsArray() {
+        const arr = [];
+        const y = H * 0.60;
+        const x0 = W * 0.10, x1 = W * 0.90;
+        for (let i = 0; i < N_WFS; i++) {
+            arr.push({ x: x0 + (x1 - x0) * (i / (N_WFS - 1)), y: y });
+        }
+        return arr;
+    }
+
+    function drawWFS(px, py) {
+        const arr = wfsArray();
+        const lineY = arr[0].y;
+        // 음원은 배열 뒤쪽(위)에 있어야 의미가 있습니다
+        const syy = Math.min(py, lineY - 40);
+
+        // 배열 선
+        ctx.beginPath();
+        ctx.moveTo(arr[0].x, lineY);
+        ctx.lineTo(arr[N_WFS - 1].x, lineY);
+        ctx.strokeStyle = 'rgba(26,26,26,0.10)';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        // 진행 중인 펄스들
+        for (let k = 0; k < N_PULSE; k++) {
+            const age = (t + k * PULSE_GAP) % CYCLE;
+
+            // 1차 파면 — 배열 뒤쪽에만 그립니다
+            const R = age * C;
+            if (R > 2 && R < Math.max(W, H) * 1.1) {
+                ctx.save();
+                ctx.beginPath();
+                ctx.rect(0, 0, W, lineY);
+                ctx.clip();
+                ctx.beginPath();
+                ctx.arc(px, syy, R, 0, Math.PI * 2);
+                ctx.strokeStyle = 'rgba(26,26,26,' + (0.13 * (1 - R / (Math.max(W, H) * 1.1)) * intensity) + ')';
+                ctx.lineWidth = 1.2;
+                ctx.stroke();
+                ctx.restore();
+            }
+
+            // 각 스피커의 2차 파면 — 1차 파면이 도달한 뒤부터 앞쪽으로 퍼집니다
+            ctx.save();
+            ctx.beginPath();
+            ctx.rect(0, lineY, W, H - lineY);
+            ctx.clip();
+            arr.forEach(function (s) {
+                const dx = s.x - px, dy = s.y - syy;
+                const delay = Math.sqrt(dx * dx + dy * dy) / C;
+                const r = (age - delay) * C;
+                if (r <= 1) return;
+                const fade = 1 - r / (Math.max(W, H) * 0.50);
+                if (fade <= 0) return;
+                ctx.beginPath();
+                ctx.arc(s.x, s.y, r, 0, Math.PI * 2);
+                ctx.strokeStyle = 'rgba(26,26,26,' + (0.055 * fade * intensity) + ')';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+            });
+            ctx.restore();
+
+            // 방금 발화한 스피커를 잠깐 밝힙니다
+            arr.forEach(function (s) {
+                const dx = s.x - px, dy = s.y - syy;
+                const delay = Math.sqrt(dx * dx + dy * dy) / C;
+                const since = age - delay;
+                if (since < 0 || since > 16) return;
+                const w = 1 - since / 16;
+                ctx.beginPath();
+                ctx.arc(s.x, s.y, 2.5 + w * 5 * intensity, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(26,26,26,' + (0.15 + 0.45 * w * intensity) + ')';
+                ctx.fill();
+            });
+        }
+
+        // 정지 상태의 스피커
+        arr.forEach(function (s) {
+            ctx.beginPath();
+            ctx.arc(s.x, s.y, 2, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(26,26,26,0.16)';
+            ctx.fill();
+        });
+
+        // 음원
+        ctx.beginPath();
+        ctx.arc(px, syy, 4.5, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(26,26,26,' + (0.5 * intensity) + ')';
+        ctx.fill();
+    }
+
+    /* ---------- 루프 ---------- */
+    function frame() {
+        t += 1;
+
+        if (idle) {
+            // 커서가 없으면 음원이 천천히 표류합니다
+            idleT += 0.006;
+            tx = 0.5 + Math.sin(idleT) * 0.26 + Math.sin(idleT * 2.3) * 0.07;
+            ty = 0.42 + Math.cos(idleT * 0.8) * 0.16;
+        }
+        sx += (tx - sx) * 0.055;
+        sy += (ty - sy) * 0.055;
+
+        ctx.clearRect(0, 0, W, H);
+        const px = sx * W, py = sy * H;
+
+        if (mode === 'diffusion') drawDiffusion(px, py);
+        else drawWFS(px, py);
+
+        paintGrain(ctx, W, H, 0.035 * grainGain);
+
+        if (!reduceMotion) requestAnimationFrame(frame);
+    }
+
+    // resize() 는 CYCLE / PULSE_GAP 을 계산하므로 그 선언 뒤에서 처음 호출합니다
+    resize();
+    frame();
+
+    /* ---------- 컨트롤 ---------- */
+    const NOTES = {
+        diffusion: 'DBAP 는 실제 공간 확산에 쓰이는 패닝 알고리즘입니다. ' +
+                   '아래 작품들의 스피커 배치도와 같은 어휘를 씁니다.',
+        wfs: 'ICST 프로젝트 요약이 명시적으로 언급하는 기법입니다. ' +
+             '하위헌스 원리 — 2차 파면의 중첩이 1차 파면을 재구성합니다.'
+    };
+    const noteEl = document.getElementById('note');
+    noteEl.textContent = NOTES.diffusion;
+
+    document.getElementById('modeSeg').addEventListener('click', function (e) {
+        const b = e.target.closest('button');
+        if (!b) return;
+        this.querySelectorAll('button').forEach(function (x) { x.classList.remove('active'); });
+        b.classList.add('active');
+        mode = b.dataset.mode;
+        noteEl.textContent = NOTES[mode];
+    });
+
+    document.getElementById('intensity').addEventListener('input', function () {
+        intensity = parseFloat(this.value);
+        document.getElementById('vInt').textContent = intensity.toFixed(1);
+    });
+    document.getElementById('grain').addEventListener('input', function () {
+        grainGain = parseFloat(this.value);
+        document.getElementById('vGrain').textContent = grainGain.toFixed(1);
+    });
+    document.getElementById('grainPx').addEventListener('input', function () {
+        buildGrain(parseInt(this.value, 10));
+        document.getElementById('vPx').textContent = this.value + 'px';
+    });
+})();
+</script>
+
+</body>
+</html>
