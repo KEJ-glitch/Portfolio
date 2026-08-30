@@ -191,8 +191,21 @@
             lowCtx.putImageData(lowImg, 0, 0);
         }
 
+        /* 화면 밖으로 나가면 루프를 멈춥니다.
+           이게 없으면 히어로를 지나 한참 스크롤한 뒤에도 매 프레임 밀도장을
+           계산하느라 CPU 를 계속 쓰게 되고, 페이지가 무거워집니다. */
+        let visible = true;
+        if ('IntersectionObserver' in window) {
+            new IntersectionObserver(function (entries) {
+                const wasVisible = visible;
+                visible = entries[0].isIntersecting;
+                if (visible && !wasVisible) requestAnimationFrame(frame);   // 다시 보이면 재개
+            }, { rootMargin: '120px' }).observe(host);
+        }
+
         let odd = false;
         function frame() {
+            if (!visible) return;          // 멈춤 (다시 보일 때 재개)
             t += 1;
 
             SRC.forEach(function (o, i) {

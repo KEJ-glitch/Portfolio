@@ -113,6 +113,10 @@
             width: 100vw; margin-left: calc(50% - 50vw);
             min-height: 470px; overflow: hidden;
             background: #111; color: #fff; text-decoration: none;
+            /* 화면 밖 배너는 렌더링을 건너뜁니다.
+               contain-intrinsic-size 가 있어야 스크롤 높이가 튀지 않습니다. */
+            content-visibility: auto;
+            contain-intrinsic-size: auto 470px;
         }
         .wrow:hover { opacity: 1; }   /* 전역 a:hover 페이드 해제 */
 
@@ -557,10 +561,10 @@ const WORKS = [
     t:'island air', y:2023, href:'details/project07_islandAir.html', img:'images/work07.jpg',
     sub:'for Realtime Audio-visual', venue:'Nodeul Gallery, Seoul',
     ch:'2ch', chN:2,
-    diffusion:'Front L/R',
+    diffusion:'Rear L/R',
     input:'Air-quality API keyed to location',
     tools:'Max 8, Jitter',
-    speakers:[[22,24],[78,24]],
+    speakers:[[22,84],[78,84]],
     live:0.7
   },
   {
@@ -871,7 +875,19 @@ const WORKS = [
         drawPath();
         projected = drawNodes();
 
-        requestAnimationFrame(frame);
+        if (mapVisible) requestAnimationFrame(frame);
+    }
+
+    /* 지도가 화면 밖으로 나가면 루프를 멈춥니다.
+       작품 목록까지 스크롤한 뒤에도 매 프레임 11개 노드를 투영하고 있으면
+       스크롤이 무거워집니다. */
+    let mapVisible = true;
+    if ('IntersectionObserver' in window) {
+        new IntersectionObserver(function (entries) {
+            const was = mapVisible;
+            mapVisible = entries[0].isIntersecting;
+            if (mapVisible && !was) requestAnimationFrame(frame);
+        }, { rootMargin: '120px' }).observe(wrap);
     }
     frame();
 
@@ -1022,7 +1038,9 @@ const WORKS = [
             row.className = 'wrow';
             row.href = w.href;
             row.innerHTML =
-                '<img class="wbg" src="' + w.img + '" alt="' + w.t + '">' +
+                // lazy + async: 11장을 한꺼번에 내려받고 디코딩하지 않도록
+                '<img class="wbg" src="' + w.img + '" alt="' + w.t + '" ' +
+                    'loading="lazy" decoding="async">' +
                 '<span class="wscrim"></span>' +
                 '<div class="winner">' +
                     '<div class="wtext">' +
