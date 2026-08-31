@@ -1,0 +1,92 @@
+[
+ {
+  "slug": "work01_regulation",
+  "title": "REGULATION",
+  "src": "works/REGULATION.mp4",
+  "start": 480,
+  "mmss": "8:00",
+  "in_lufs": -18.21,
+  "in_tp": -0.3,
+  "kb": 477
+ },
+ {
+  "slug": "work02_doppelganger",
+  "title": "Doppelgänger",
+  "src": "works/Doppelganger.mp4",
+  "start": 443,
+  "mmss": "7:23",
+  "in_lufs": -16.64,
+  "in_tp": -2.3,
+  "kb": 477
+ },
+ {
+  "slug": "work04_axiom",
+  "title": "Axiom",
+  "src": "audio/_archive/Axiom_6ch.flac",
+  "start": 79,
+  "mmss": "1:19",
+  "in_lufs": -22.11,
+  "in_tp": -8.69,
+  "kb": 477
+ },
+ {
+  "slug": "work05_interrupt",
+  "title": "interrupt",
+  "src": "audio/_archive/interrupt_4ch.flac",
+  "start": 135,
+  "mmss": "2:15",
+  "in_lufs": -22.08,
+  "in_tp": -5.87,
+  "kb": 477
+ },
+ {
+  "slug": "work06_datenprotokoll",
+  "title": "DATENPROTOKOLL",
+  "src": "works/datenprotokoll.mp4",
+  "start": 75,
+  "mmss": "1:15",
+  "in_lufs": -12.51,
+  "in_tp": 0.12,
+  "kb": 490
+ },
+ {
+  "slug": "work08_diamonddust",
+  "title": "Diamond Dust",
+  "src": "audio/_archive/DiamondDust_2ch.flac",
+  "start": 778,
+  "mmss": "12:58",
+  "in_lufs": -17.04,
+  "in_tp": -3.12,
+  "kb": 476
+ },
+ {
+  "slug": "work09_axiom2",
+  "title": "Axiom 2",
+  "src": "audio/_archive/Axiom2_2ch.flac",
+  "start": 110,
+  "mmss": "1:50",
+  "in_lufs": -19.77,
+  "in_tp": -1.96,
+  "kb": 477
+ },
+ {
+  "slug": "work10_lucid",
+  "title": "Lucid",
+  "src": "audio/_archive/Lucid_streamB.flac",
+  "start": 175,
+  "mmss": "2:55",
+  "in_lufs": -18.28,
+  "in_tp": -1.78,
+  "kb": 477
+ },
+ {
+  "slug": "work11_sequential",
+  "title": "Sequential",
+  "src": "audio/_archive/Sequential_2ch.flac",
+  "start": 1058,
+  "mmss": "17:38",
+  "in_lufs": -20.63,
+  "in_tp": -6.76,
+  "kb": 477
+ }
+]

@@ -1,1 +1,6 @@
 HANDOFF.md
+works/
+.DS_Store
+audio/_candidates/
+audio/_archive/
+audio/check.html

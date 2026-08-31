@@ -26,6 +26,16 @@
         grainPixel: 3
     };
 
+    /* ----------------------------------------------------------
+       외부 구동값. 3D 지도에서 소리가 재생되면 그쪽이 채웁니다.
+       아무도 채우지 않으면 0 이므로 이 파일 단독으로도 예전과 똑같이 돕니다.
+       level    전체 크기        0~1
+       lowBand  저역(무늬 크기)   0~1
+       highBand 고역(입자감)      0~1
+       ---------------------------------------------------------- */
+    const DRIVE = (window.__interferenceDrive =
+        window.__interferenceDrive || { level: 0, lowBand: 0, highBand: 0 });
+
     // ---------- 그레인 타일 ----------
     // 매 프레임 픽셀을 만들면 무거우므로 타일 하나를 만들어 위치만 흔들어 재사용
     const GRAIN = { block: CONFIG.grainPixel, tile: null, size: 0 };
@@ -97,6 +107,8 @@
         const lowCtx = low.getContext('2d');
         let lw = 1, lh = 1, lowImg = null;
         let W = 0, H = 0, dpr = 1, t = 0;
+        // 구동값은 캔버스마다 따로 따라갑니다 (급변 방지용 1차 저역통과)
+        let dLevel = 0, dLow = 0, dHigh = 0;
 
         /* 세 음원. 파장을 어긋난 비율로 두어야 무늬가 규칙적으로
            반복되지 않고 계속 새로 태어납니다. */
@@ -148,11 +160,17 @@
             const data = lowImg.data;
             const stepX = W / lw, stepY = H / lh;
 
+            /* 소리에 반응하는 폭은 아주 좁아야 합니다.
+               듣지 않는 사람은 차이를 알아채지 못해야 하고,
+               크게 움직이는 순간 음악 비주얼라이저가 됩니다. */
+            const densNow = cfg.density    * (1 + dLevel * 0.28);
+            const wlNow   = cfg.wavelength * (1 + dLow   * 0.10);
+
             const s = SRC.map(function (o) {
                 return {
                     x: o.hx * W,
                     y: o.hy * H,
-                    k: (Math.PI * 2) / (o.wl * cfg.wavelength),
+                    k: (Math.PI * 2) / (o.wl * wlNow),
                     w: o.sp, a: o.amp, ph: o.ph
                 };
             });
@@ -181,7 +199,7 @@
                     const ex = Math.min(1, Math.min(xi, lw - 1 - xi) / (lw * 0.22));
                     const bias = 0.55 + 0.45 * fx;   // 글자가 놓이는 왼쪽은 조금 더 옅게
 
-                    const a = v * ey * ex * bias * cfg.density * 0.30;
+                    const a = v * ey * ex * bias * densNow * 0.30;
 
                     data[p] = 26; data[p + 1] = 26; data[p + 2] = 30;
                     data[p + 3] = (a * 255) | 0;
@@ -208,6 +226,12 @@
             if (!visible) return;          // 멈춤 (다시 보일 때 재개)
             t += 1;
 
+            /* 스무딩을 걸지 않으면 배경이 깜빡여 즉시 조잡해집니다.
+               0.045 는 대략 0.4초에 걸쳐 따라붙는 속도입니다. */
+            dLevel += (DRIVE.level    - dLevel) * 0.045;
+            dLow   += (DRIVE.lowBand  - dLow)   * 0.045;
+            dHigh  += (DRIVE.highBand - dHigh)  * 0.045;
+
             SRC.forEach(function (o, i) {
                 o.hx += o.dx; o.hy += o.dy;
                 if (o.hx < 0.08 || o.hx > 0.92) o.dx *= -1;
@@ -227,7 +251,7 @@
             if ('imageSmoothingQuality' in ctx) ctx.imageSmoothingQuality = 'high';
             ctx.drawImage(low, 0, 0, W, H);
 
-            paintGrain(ctx, W, H, 0.030 * CONFIG.grain);
+            paintGrain(ctx, W, H, 0.030 * CONFIG.grain * (1 + dHigh * 0.30));
 
             if (!reduceMotion) requestAnimationFrame(frame);
         }

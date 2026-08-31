@@ -554,3 +554,198 @@ noembed { display: block; }
         font-size: 0.8rem; /* 모바일에서는 글자 조금 작게 */
     }
 }
+
+/* =========================================
+   상세 페이지 풀-와이드 미디어 (영상)
+   지금까지 페이지마다 인라인으로 중복돼 있었습니다.
+   영상이 없던 페이지에도 쓸 수 있도록 공용으로 옮겨 둡니다.
+   (인라인 사본이 있는 페이지는 그쪽이 나중에 와서 그대로 이깁니다)
+   ========================================= */
+.full-width-media {
+    width: 100%; position: relative;
+    background-color: #000; margin-bottom: 60px;
+}
+.full-width-media.video-mode { height: 60vh; }
+.full-width-media iframe,
+.full-width-media embed { width: 100%; height: 100%; border: none; }
+
+/* 영상이 무엇인지 밝혀야 할 때 (리허설 기록 등) */
+.media-cap {
+    /* .container 와 같은 폭·여백이어야 본문과 왼쪽 선이 맞습니다 */
+    max-width: 1250px; margin: -44px auto 60px; padding: 0 40px;
+    font-size: 0.78rem; color: var(--text-secondary); letter-spacing: 0.02em;
+}
+
+/* =========================================
+   제약 조건 블록 (상세 페이지 · Constraints)
+   프로그램 노트보다 한 단계 낮은 톤. 테두리 없이 여백으로만 구분합니다.
+   ========================================= */
+.constraints { margin-top: 56px; }
+.description .constraints p {
+    font-size: 1rem; color: #555; line-height: 1.8; margin-bottom: 20px;
+}
+.description .constraints p:last-child { margin-bottom: 0; }
+
+
+.print-only { display: none; }
+
+/* =========================================
+   인쇄 (@media print)
+   심사위원회가 포트폴리오 링크를 인쇄하는 경우를 위한 문서 버전.
+   캔버스·배너 음영·동영상은 인쇄에 남길 것이 없으므로 걷어내고,
+   글자와 스펙 표, 스피커 배치도만 검정 잉크로 떨어지게 합니다.
+   ========================================= */
+@media print {
+
+    @page { margin: 16mm 14mm; }
+
+    html, body {
+        background: #FFF !important; color: #000 !important;
+        overflow: visible !important;
+        font-size: 10.5pt; line-height: 1.55;
+    }
+
+    /* --- 화면 전용 요소 제거 --- */
+    header nav,
+    .back-to-top,
+    .hero-canvas,
+    #map,                       /* 3D 산점도: 캔버스라 인쇄에 남는 것이 없음 */
+    .wtoolbar,                  /* 정렬 버튼 */
+    .full-width-media,          /* YouTube iframe */
+    .media-cap,                 /* 영상이 빠지면 그 설명도 뜻이 없습니다 */
+    iframe,
+    .divider,
+    .profile-slide:not(.active),
+    .full-slide:not(.active) { display: none !important; }
+
+    /* --- 머리글: 이름만 한 줄로 --- */
+    header {
+        padding: 0 0 6mm !important; position: static !important;
+        background: none !important; border: 0 !important;
+    }
+    .logo { font-size: 12pt !important; color: #000 !important; }
+
+    .container { max-width: none !important; width: auto !important; padding: 0 !important; }
+
+    a { color: #000 !important; text-decoration: none !important; }
+
+    /* 제목이 페이지 끝에 홀로 남지 않도록 */
+    h1, h2, h3, h4, .section-title, .cv-title { break-after: avoid; page-break-after: avoid; }
+
+    /* --- 히어로 --- */
+    .hero { padding: 0 0 10mm !important; min-height: 0 !important; overflow: visible !important; }
+    .hero h1 { font-size: 26pt !important; line-height: 1.05 !important; margin: 2mm 0 4mm !important; }
+    .hero .subtitle { font-size: 9pt !important; }
+    .hero .description { font-size: 10.5pt !important; color: #333 !important; }
+    .print-only {
+        display: block !important; font-family: monospace;
+        font-size: 9pt; color: #666; margin-top: 5mm; letter-spacing: 0.04em;
+    }
+
+    /* --- 섹션 --- */
+    .section { padding: 8mm 0 0 !important; border-top: 1px solid #DDD !important; }
+    .section-title { margin-bottom: 6mm !important; color: #666 !important; }
+
+    /* --- 작품 목록: 배너를 문서 항목으로 --- */
+    /* content-visibility 를 풀지 않으면 화면 밖 배너가 통째로 빈 칸으로 인쇄됩니다 */
+    .wrow {
+        display: block !important;
+        content-visibility: visible !important;
+        contain-intrinsic-size: auto !important;
+        min-height: 0 !important; height: auto !important;
+        margin: 0 0 9mm !important; padding: 0 !important;
+        background: none !important; overflow: visible !important;
+        break-inside: avoid; page-break-inside: avoid;
+    }
+    .wbg, .wscrim { display: none !important; }
+    .winner {
+        position: static !important; display: block !important;
+        min-height: 0 !important; padding: 0 !important;
+    }
+    .wtext, .spec { max-width: none !important; }
+    .wrow h3 { font-size: 14pt !important; color: #000 !important; margin: 0 0 1.5mm !important; }
+    .wrow .wsub  { font-size: 10pt !important; color: #333 !important; margin-bottom: 1mm !important; }
+    .wrow .wmeta { font-size: 8.5pt !important; color: #666 !important; }
+
+    .spec { font-size: 9pt !important; margin-top: 3mm !important; break-inside: avoid; }
+    .spec dl { grid-template-columns: 24mm 1fr !important; gap: 1px 6mm !important; }
+    .spec dt { color: #777 !important; }
+    .spec dd { color: #000 !important; }
+
+    /* 배치도: 배너 정중앙 절대배치를 풀어 스펙 표 옆에 세웁니다 */
+    /* 스펙 표와 배치도를 한 줄에 나란히 — 작품 한 건의 높이를 줄입니다 */
+    .spec { display: flex !important; align-items: flex-start !important; gap: 12mm !important; }
+    .spec dl { flex: 1 1 auto !important; }
+    .sdiag-wrap {
+        position: static !important; transform: none !important;
+        flex: 0 0 auto !important; width: 30mm !important;
+        text-align: left !important; margin: 0 !important;
+    }
+    .sdiag-cap { color: #777 !important; text-align: left !important; margin-bottom: 1.5mm !important; }
+    .sdiag {
+        width: 24mm !important; height: 24mm !important; margin: 0 !important;
+        filter: none !important;    /* drop-shadow 는 잉크만 먹습니다 */
+    }
+    .sdiag .room   { stroke: #AAA !important; }
+    .sdiag .spk    { fill: #000 !important; }
+    .sdiag .dlbl   { fill: #777 !important; }
+    .sdiag .hp     { stroke: #000 !important; }
+    .sdiag .hp-cup { fill: #000 !important; }
+
+    /* --- ABOUT --- */
+    .about-layout, .bio-container { display: block !important; }
+    .bio-text p { font-size: 10pt !important; color: #222 !important; }
+    .lang-title { color: #777 !important; }
+    .tag-list { font-size: 9pt !important; }
+    .profile-slider {
+        float: right !important; width: 38mm !important;
+        height: auto !important; margin: 0 0 4mm 8mm !important;
+        background: none !important; overflow: visible !important;
+    }
+    .profile-slide.active {
+        position: static !important; display: block !important;
+        width: 100% !important; height: auto !important;
+        object-fit: contain !important; opacity: 1 !important;
+    }
+    .cv-row, .cv-section { break-inside: avoid; page-break-inside: avoid; }
+    .cv-item { font-size: 9.5pt !important; }
+
+    /* --- CONTACT / FOOTER --- */
+    .email-link { font-size: 12pt !important; }
+    footer { padding: 6mm 0 0 !important; font-size: 8.5pt !important; color: #777 !important; }
+
+    /* --- 상세 페이지 --- */
+    .detail-header { padding: 0 0 6mm !important; min-height: 0 !important; }
+    .detail-header h1 { font-size: 22pt !important; }
+    .full-width-slider {
+        height: auto !important; max-height: 95mm !important;
+        margin: 6mm 0 !important; background: none !important;
+        break-inside: avoid; page-break-inside: avoid;
+    }
+    .full-slide.active {
+        position: static !important; display: block !important;
+        width: auto !important; max-width: 100% !important;
+        max-height: 95mm !important; object-fit: contain !important;
+        opacity: 1 !important;
+    }
+    .detail-content { display: block !important; }
+    .description p { font-size: 10.5pt !important; color: #000 !important; }
+    .constraints { margin-top: 8mm !important; break-inside: avoid; page-break-inside: avoid; }
+    .description .constraints p { color: #333 !important; }
+    .credits { margin-top: 8mm !important; break-inside: avoid; page-break-inside: avoid; }
+    .credits ul li { font-size: 9.5pt !important; border-bottom: 0 !important; padding-bottom: 2px !important; margin-bottom: 2px !important; }
+    .project-navigation { display: none !important; }
+
+    /* 외부 링크는 종이 위에서 주소가 보여야 의미가 있습니다 */
+    .project-outlink::after,
+    .external-link-block a::after {
+        content: " — " attr(href);
+        font-size: 8pt; color: #555; font-weight: 400; word-break: break-all;
+    }
+    .external-link-block .project-outlink {
+        background: none !important; background-color: transparent !important;
+        color: #000 !important; padding: 0 !important;
+        transform: none !important; border-radius: 0 !important;
+        font-size: 10pt !important;
+    }
+}
